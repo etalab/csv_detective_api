@@ -1,0 +1,118 @@
+'''Loads an annotated file and extracts features and tagged types for each resource id
+
+Usage:
+    train_model.py <i> <p> <m> [options]
+
+Arguments:
+    <i>                                An input file or directory (if dir it will convert all txt files inside).
+    <p>                                Path where to find the resource's CSVs
+    <m>                                Path where to save the trained pipeline [default: "models/"]
+    --num_files NFILES                 Number of files (CSVs) to work with [default: 10:int]
+    --num_rows NROWS                   Number of rows per file to use [default: 200:int]
+    --cores=<n> CORES                  Number of cores to use [default: 2:int]
+'''
+import glob
+# import logging
+import joblib
+from argopt import argopt
+from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, HashingVectorizer
+from sklearn.metrics import classification_report
+from sklearn.neural_network import MLPClassifier
+from sklearn.pipeline import Pipeline, FeatureUnion
+from xgboost import XGBClassifier
+
+# logger = logging.getLogger()
+# logger.setLevel(logging.DEBUG)
+# logger.addHandler(logging.StreamHandler())
+from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
+from prediction import PredictColumnInfoExtractor
+
+
+def get_files(data_path, ext="csv"):
+    return glob.glob(data_path + "/*.{}".format(ext))
+
+
+def extract_id(file_path):
+    import os
+    resource_id = os.path.basename(file_path)[:-4]
+    return resource_id
+
+if __name__ == '__main__':
+    parser = argopt(__doc__).parse_args()
+    tagged_file_path = parser.i
+    csv_folder_path = parser.p
+    output_model_path = parser.m
+    num_files = parser.num_files
+    num_rows = parser.num_rows
+
+    n_cores = int(parser.cores)
+
+    pipeline = Pipeline([
+        # Extract column info information from csv
+
+        # Use FeatureUnion to combine the features from subject and body
+        ('union', FeatureUnion(
+            transformer_list=[
+
+                # Pipeline for pulling custom features from the columns
+                ('custom_features', Pipeline([
+                    ('selector', ItemSelector(key='per_file_rows')),
+                    ('customfeatures', CustomFeatures(n_jobs=n_cores)),
+                    ("customvect", DictVectorizer())
+                ])),
+
+                # Pipeline for standard bag-of-words models for cell values
+                ('cell_features', Pipeline([
+                    ('selector', ItemSelector(key='all_columns')),
+                    ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
+                ])),
+
+                # Pipeline for standard bag-of-words models for header values
+                ('header_features', Pipeline([
+                    ('selector', ItemSelector(key='all_headers')),
+                    # ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
+                    ('hash', HashingVectorizer(n_features=2 ** 1, ngram_range=(1, 3), analyzer="char_wb")),
+
+                ])),
+
+            ],
+
+            # weight components in FeatureUnion
+            # transformer_weights={
+            #     'column_custom': .499,
+            #     'cell_bow': .499,
+            #     'header_bow': 0.02,
+            # },
+
+        )),
+
+        # Use a SVC classifier on the combined features
+        ('XG', XGBClassifier(n_jobs=5)),
+
+    ])
+
+    train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=.7, n_jobs=n_cores).transform(
+        annotations_file=tagged_file_path,
+        csv_folder=csv_folder_path)
+
+    pipeline.fit(train, train["y"])
+    if test is not None:
+        y_test = test["y"]
+        y_pred = pipeline.predict(test)
+        print(classification_report(y_test, y_pred=y_pred))
+
+    # Save pipeline
+    joblib.dump(pipeline, output_model_path + '/model.joblib')
+
+    from prediction import PredictColumnInfoExtractor
+
+    ext = PredictColumnInfoExtractor()
+    foo = ext.transform("../03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
+    y_pred = pipeline.predict(foo)
+    print(y_pred)
+    pass
+
+
+
+
