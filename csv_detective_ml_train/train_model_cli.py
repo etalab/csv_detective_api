@@ -26,7 +26,7 @@ from xgboost import XGBClassifier
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler())
 from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
-from prediction import PredictColumnInfoExtractor
+# from prediction import PredictColumnInfoExtractor
 
 
 def get_files(data_path, ext="csv"):
