@@ -1,12 +1,17 @@
 #!flask/bin/python
-import os
 
 import requests
 from flask import Flask
 from flask import request
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
+
 
 # creating and saving some models
-from prediction import PredictColumnInfoExtractor
+from csv_detective_ml.prediction import get_columns_prediction, get_columns_types
 
 # reg_model = linear_model.LinearRegression()
 # reg_model.fit([[1., 1., 5.], [2., 2., 5.], [3., 3., 1.]], [0., 0., 1.])
@@ -28,18 +33,19 @@ def get_prediction():
     r = requests.get(resource_url, allow_redirects=True, timeout=5)
     resource_content = r.content
 
+    y_pred, csv_info = get_columns_prediction("03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
+    dict_columns = get_columns_types(y_pred, csv_info)
+
+
     # prediction = ML_PIPELINE.predict([[feature1, feature2, feature3]])
-    return str(prediction)
+    # return str(prediction)
+    return
 
 
 
 
 if __name__ == '__main__':
-    ext = PredictColumnInfoExtractor()
-    foo = ext.transform("55cd803a-998d-4a5c-9741-4cd0ee0a7699.csv")
-
     pass
-
     # if os.environ['ENVIRONMENT'] == 'production':
     #     app.run(port=80, host='0.0.0.0')
     # if os.environ['ENVIRONMENT'] == 'local':

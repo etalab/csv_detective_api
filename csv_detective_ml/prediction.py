@@ -9,9 +9,9 @@ from csv_detective.detection import detect_encoding, detect_separator, detect_he
 import pandas as pd
 from tqdm import tqdm
 import numpy as np
-from csv_detective_ml_train import  features
+from csv_detective_ml import  features
+from main import logger
 
-ML_PIPELINE = joblib.load('../models/model.joblib')
 
 
 
@@ -83,7 +83,8 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
             rows_values.extend(file_columns[i])
 
         assert len(rows_values) == len(columns_names)
-        datasets_info = {"all_columns": rows_values, "all_headers": columns_names, "per_file_rows": [file_columns]}
+        datasets_info = {"all_columns": rows_values, "all_headers": columns_names, "per_file_rows": [file_columns],
+                         "headers": list(csv_df.columns)}
 
         return datasets_info
 
@@ -102,12 +103,40 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
         return columns_info
 
 
-def detect_columns_types(csv_path):
+def get_columns_prediction(csv_path, pipeline):
     ext = PredictColumnInfoExtractor()
-    foo = ext.transform(csv_path)
-    y_pred = ML_PIPELINE.predict(foo)
-    print(y_pred)
-    pass
+    csv_info = ext.transform(csv_path)
+    if not csv_info:
+        # logger.error("Could not read {}".format(csv_path))
+        return
 
-# detect_columns_types("../03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
+    y_pred = pipeline.predict(csv_info)
+    return y_pred, csv_info
+
+
+def get_columns_types(y_pred, csv_info):
+    def get_most_frequent(list_predictions):
+        u, counts = np.unique(list_predictions, return_counts=True)
+        return u[0]
+
+
+
+    from collections import OrderedDict
+    num_columns = [len(f) for f in csv_info["per_file_rows"]][0]
+    assert(len(y_pred) == len(csv_info["all_headers"]))
+    dict_columns = defaultdict(list)
+    head_pred = list(zip(csv_info["all_headers"], y_pred))
+    for header in csv_info["headers"]:
+        per_head_predictions = [f[1] for f in head_pred if f[0] == header.lower()]
+        if not per_head_predictions:
+            continue
+        else:
+            most_freq_label = get_most_frequent(per_head_predictions)
+            if most_freq_label == "O":
+                continue
+            dict_columns[header].append(most_freq_label)
+    return dict_columns
+
+# y_pred, csv_info = get_columns_prediction("03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
+# dict_columns = get_columns_types(y_pred, csv_info)
 pass

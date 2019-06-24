@@ -14,7 +14,6 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.svm import SVC
-from tqdm import tqdm
 from xgboost import XGBClassifier
 import re
 
@@ -191,10 +190,10 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
         if self.n_jobs and self.n_jobs > 1:
             csv_info = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._extract_columns)(file_path)
-                for file_path in tqdm(list_files))
+                for file_path in list_files)
         else:
             csv_info = [self._extract_columns(f)
-                        for f in tqdm(list_files)]
+                        for f in list_files]
 
         dataset_items = defaultdict(lambda: defaultdict(list))
         for datasets in csv_info:
@@ -245,10 +244,10 @@ class CustomFeatures(BaseEstimator, TransformerMixin):
         if self.n_jobs and self.n_jobs > 1:
             features = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._extract_custom_features)(file_path)
-                for file_path in tqdm(rows_values))
+                for file_path in rows_values)
         else:
             features = [self._extract_custom_features(f)
-                        for f in tqdm(rows_values)]
+                        for f in rows_values]
 
         features = list(chain.from_iterable(features))
         return features
@@ -335,148 +334,7 @@ class CustomFeatures(BaseEstimator, TransformerMixin):
                 list_features.append(features)
                 # print(value, str(features))
 
-
         return list_features
 
     def fit(self, x, y=None):
         return self
-
-
-# if __name__ == '__main__':
-#
-#     # return {"all_columns": rows_values, "y": rows_labels, "all_headers": columns_names,
-#     #         "per_file_labels": file_labels, "per_file_rows": file_columns}
-#
-#     pipeline = Pipeline([
-#         # Extract column info information from csv
-#
-#         # Use FeatureUnion to combine the features from subject and body
-#         ('union', FeatureUnion(
-#             transformer_list=[
-#
-#                 # Pipeline for pulling custom features from the columns
-#                 ('custom_features', Pipeline([
-#                     ('selector', ItemSelector(key='per_file_rows')),
-#                     ('customfeatures', CustomFeatures(n_jobs=1)),
-#                     ("customvect", DictVectorizer())
-#                 ])),
-#
-#                 # Pipeline for standard bag-of-words models for cell values
-#                 ('cell_features', Pipeline([
-#                     ('selector', ItemSelector(key='all_columns')),
-#                     ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
-#                 ])),
-#
-#                 # Pipeline for standard bag-of-words models for header values
-#                 ('header_features', Pipeline([
-#                     ('selector', ItemSelector(key='all_headers')),
-#                     ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
-#                 ])),
-#
-#             ],
-#
-#             # weight components in FeatureUnion
-#             transformer_weights={
-#                 'column_custom': 1.0,
-#                 'cell_bow': 1.0,
-#                 'header_bow': .0003,
-#             },
-#
-#         )),
-#
-#         # Use a SVC classifier on the combined features
-#         # ('LR', LogisticRegression(multi_class="ovr", n_jobs=-1, solver="lbfgs")),
-#         ('XG', XGBClassifier(n_jobs=5)),
-#     ])
-#
-#     annotations_file = "./csv_detective/machine_learning/data/columns_annotation.csv"
-#     csv_folder = "/data/datagouv/csv_top/"
-#
-#
-#     train, test = ColumnInfoExtractor(n_files=50, n_rows=50, train_size=.7, n_jobs=10).transform(
-#         annotations_file=annotations_file,
-#         csv_folder=csv_folder)
-#
-#     debug = False
-#
-#     if test is None: # good performance
-#         pipelinem1 = Pipeline(pipeline.steps[:-1])
-#         X = pipelinem1.fit_transform(train)
-#
-#         y_true = np.array(train["y"])
-#         print(pipelinem1.named_steps["union"].transformer_list[0][1].named_steps["customvect"].get_feature_names())
-#
-#         sss = StratifiedShuffleSplit(n_splits=1, train_size=.7, random_state=42)
-#         indices = list(sss.split(X, train["y"]))
-#         train_indices, test_indices = sorted(indices[0][0]), sorted(indices[0][1])
-#         X_train, X_test = X[train_indices], X[test_indices]
-#         y_train, y_test = y_true[train_indices], y_true[test_indices]
-#
-#         visualize_matrices([X_train], names=["X_train"])
-#         X2 = vstack([X_train, X_test])
-#         visualize_matrices([X2], names=["X2"])
-#         # visualize_matrices([X_train, X_test], names=["X_train", "X_test"])
-#
-#         clf = XGBClassifier(n_jobs=5)
-#         # clf = LogisticRegression()
-#
-#         clf.fit(X_train, y_train)
-#         y_pred = clf.predict(X_test)
-#         print(classification_report(y_test, y_pred=y_pred))
-#
-#         exit(0)
-#
-#     else: # shitty performance
-#         pipelinem1 = Pipeline(pipeline.steps[:-1])
-#         pepe = Pipeline(pipeline.steps[:-1])
-#
-#         X_train = pipelinem1.fit_transform(train)
-#         # X_test_pp = pepe.fit_transform(test)
-#
-#         X_test = pipelinem1.transform(test)
-#         X_test = X_test[:, range(X_test.shape[1])]
-#         sss = StratifiedShuffleSplit(n_splits=1, train_size=.7, random_state=42)
-#         y_true = np.array(train["y"])
-#
-#         indices = list(sss.split(X_train, y_true))
-#         train_indices, test_indices = sorted(indices[0][0]), sorted(indices[0][1])
-#         X_train2, X_test2 = X_train[train_indices], X_train[test_indices]
-#         y_train, y_test = y_true[train_indices], y_true[test_indices]
-#
-#         # visualize_matrices([X_train], names=["X_train"])
-#         # visualize_multivariate(X_train2, y_train)
-#         # visualize_distros(X_test2, y_test)
-#         # print(pipelinem1.named_steps["union"].transformer_list[0][1].named_steps["customvect"].get_feature_names())
-#         # visualize_matrices([X_train, X_test], names=["X_train", "X_test"])
-#         clf = XGBClassifier(n_jobs=5)
-#         clf2 = XGBClassifier(n_jobs=5)
-#
-#         clf.fit(X_train2, y_train)
-#         clf2.fit(X_train, y_true)
-#         y_pred = clf.predict(X_test2)
-#         y_pred2 = clf2.predict(X_test)
-#         # pipeline.fit(train, train["y"])
-#         # y_pred = pipeline.predict(test)
-#         # visualize_distros(X_train, train["y"])
-#         # visualize_distros(X_test, test["y"])
-#
-#         print("Good clf with good test")
-#         print(classification_report(y_test, y_pred=y_pred))
-#         print("Bad clf with bad test")
-#         print(classification_report(test["y"], y_pred=y_pred2))
-#
-#         print("Good clf with bad test")
-#         print(classification_report(test["y"], y_pred=clf.predict(X_test)))
-#
-#
-#     if debug:
-#         X_test = Pipeline(pipeline.steps[:-1]).transform(test)
-#
-#         import pickle
-#         # clf = pickle.load(open("clf_training", "rb"))
-#         # y_pred = clf.predict(X_t)
-#         X_train2, y_train2 = pickle.load(open("xytrain", "rb"))
-#         clf2 = XGBClassifier(n_jobs=5)
-#         clf2.fit(X_train2, y_train2)
-#         y_pred = clf2.predict(X_test)
-#

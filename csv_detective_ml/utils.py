@@ -1,3 +1,5 @@
+import glob
+
 import numpy as np
 import matplotlib.pylab as plt
 import pandas as pd
@@ -23,3 +25,13 @@ def visualize_multivariate(X, y):
     else:
         df.groupby(["labels"])[0].plot(legend=True)
     plt.show()
+
+
+def get_files(data_path, ext="csv"):
+    return glob.glob(data_path + "/*.{}".format(ext))
+
+
+def extract_id(file_path):
+    import os
+    resource_id = os.path.basename(file_path)[:-4]
+    return resource_id

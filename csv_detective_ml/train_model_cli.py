@@ -11,14 +11,12 @@ Arguments:
     --num_rows NROWS                   Number of rows per file to use [default: 200:int]
     --cores=<n> CORES                  Number of cores to use [default: 2:int]
 '''
-import glob
 # import logging
 import joblib
 from argopt import argopt
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer, HashingVectorizer
 from sklearn.metrics import classification_report
-from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
 from xgboost import XGBClassifier
 
@@ -29,15 +27,6 @@ from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
 # from prediction import PredictColumnInfoExtractor
 
 
-def get_files(data_path, ext="csv"):
-    return glob.glob(data_path + "/*.{}".format(ext))
-
-
-def extract_id(file_path):
-    import os
-    resource_id = os.path.basename(file_path)[:-4]
-    return resource_id
-
 if __name__ == '__main__':
     parser = argopt(__doc__).parse_args()
     tagged_file_path = parser.i
@@ -47,6 +36,9 @@ if __name__ == '__main__':
     num_rows = parser.num_rows
 
     n_cores = int(parser.cores)
+
+    # from csv_detective.explore_csv import routine
+    # foo = routine("../03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv", num_rows=100)
 
     pipeline = Pipeline([
         # Extract column info information from csv
@@ -72,7 +64,7 @@ if __name__ == '__main__':
                 ('header_features', Pipeline([
                     ('selector', ItemSelector(key='all_headers')),
                     # ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
-                    ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(1, 2), analyzer="char_wb")),
+                    ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(1, 3), analyzer="char_wb")),
 
                 ])),
 
