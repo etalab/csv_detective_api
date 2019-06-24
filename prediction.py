@@ -109,5 +109,5 @@ def detect_columns_types(csv_path):
     print(y_pred)
     pass
 
-detect_columns_types("../03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
+# detect_columns_types("../03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
 pass

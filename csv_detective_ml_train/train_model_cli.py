@@ -72,7 +72,7 @@ if __name__ == '__main__':
                 ('header_features', Pipeline([
                     ('selector', ItemSelector(key='all_headers')),
                     # ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
-                    ('hash', HashingVectorizer(n_features=2 ** 1, ngram_range=(1, 3), analyzer="char_wb")),
+                    ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(1, 2), analyzer="char_wb")),
 
                 ])),
 
@@ -105,13 +105,13 @@ if __name__ == '__main__':
     # Save pipeline
     joblib.dump(pipeline, output_model_path + '/model.joblib')
 
-    from prediction import PredictColumnInfoExtractor
-
-    ext = PredictColumnInfoExtractor()
-    foo = ext.transform("../03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
-    y_pred = pipeline.predict(foo)
-    print(y_pred)
-    pass
+    # from prediction import PredictColumnInfoExtractor
+    #
+    # ext = PredictColumnInfoExtractor()
+    # foo = ext.transform("../03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
+    # y_pred = pipeline.predict(foo)
+    # print(y_pred)
+    # pass
 
 
 
