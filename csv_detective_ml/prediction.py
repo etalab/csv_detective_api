@@ -1,16 +1,10 @@
 # import os
-import pickle
 from collections import defaultdict
 
-import joblib
-from joblib import Parallel, delayed
 from sklearn.base import BaseEstimator, TransformerMixin
 from csv_detective.detection import detect_encoding, detect_separator, detect_headers, parse_table
-import pandas as pd
-from tqdm import tqdm
 import numpy as np
-from csv_detective_ml import  features
-from main import logger
+import features
 
 
 
