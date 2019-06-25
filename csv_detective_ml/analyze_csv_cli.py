@@ -20,7 +20,11 @@ from csv_detective.explore_csv import routine
 from joblib import Parallel, delayed, load
 from tqdm import tqdm
 
-from main import logger
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
+
 from prediction import get_columns_prediction, get_columns_types
 from utils import extract_id, get_files
 ML_PIPELINE = None
