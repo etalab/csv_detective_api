@@ -10,6 +10,7 @@ Arguments:
     --num_files NFILES                 Number of files (CSVs) to work with [default: 10:int]
     --num_rows NROWS                   Number of rows per file to use [default: 200:int]
     --cores=<n> CORES                  Number of cores to use [default: 2:int]
+    --train_size TRAIN                 Percentage for training . If 1.0, then no testing is done [default: 0.7:float]
 '''
 # import logging
 import joblib
@@ -24,6 +25,7 @@ from xgboost import XGBClassifier
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler())
 from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
+
 # from prediction import PredictColumnInfoExtractor
 
 
@@ -34,7 +36,7 @@ if __name__ == '__main__':
     output_model_path = parser.m
     num_files = parser.num_files
     num_rows = parser.num_rows
-
+    train_size = parser.train_size
     n_cores = int(parser.cores)
 
     # from csv_detective.explore_csv import routine
@@ -84,9 +86,9 @@ if __name__ == '__main__':
 
     ])
 
-    train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=.7, n_jobs=n_cores).transform(
-        annotations_file=tagged_file_path,
-        csv_folder=csv_folder_path)
+    train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
+                                      n_jobs=n_cores).transform(annotations_file=tagged_file_path,
+                                                                csv_folder=csv_folder_path)
 
     pipeline.fit(train, train["y"])
     if test is not None:
@@ -104,7 +106,3 @@ if __name__ == '__main__':
     # y_pred = pipeline.predict(foo)
     # print(y_pred)
     # pass
-
-
-
-

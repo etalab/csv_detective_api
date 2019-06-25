@@ -1,9 +1,9 @@
 '''Analyzes a folder of csv files with csv_detective. The column type detection is done with
-  both the Rule Based (RB) and Machine Learning (ML) approaches.
+  both the Rule Based (RB) and/or Machine Learning (ML) approaches.
   Saves the results as a JSON file.
 
 Usage:
-    analyze_csv.py <i> [options]
+    analyze_csv_cli.py <i> [options]
 
 Arguments:
     <i>                                An input directory with csvs(if dir it will convert all txt files inside).
@@ -78,7 +78,7 @@ if __name__ == '__main__':
                     for f in tqdm(list_files)]
 
     logger.info("Saving info to JSON")
-    json.dump(dict(csv_info), open(csv_folder_path + "/csv_data.json", "w"))
+    json.dump(dict(csv_info), open("../csv_data.json", "w"))
     pass
 
 
