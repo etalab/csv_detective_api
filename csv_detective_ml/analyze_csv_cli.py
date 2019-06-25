@@ -41,8 +41,9 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None):
             logger.debug("Analyzing file {0} failed with {1}".format(file_path, e))
             return extract_id(file_path), dict_result
 
-        dict_result["columns_rb"] = dict_result["columns"]
-        dict_result.pop("columns")
+        if "columns" in dict_result:
+            dict_result["columns_rb"] = dict_result["columns"]
+            dict_result.pop("columns")
     else:
         # Get ML tagging
         try:
