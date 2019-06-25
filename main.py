@@ -10,12 +10,7 @@ logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 
 
-# creating and saving some models
-from csv_detective_ml.prediction import get_columns_prediction, get_columns_types
-
-# reg_model = linear_model.LinearRegression()
-# reg_model.fit([[1., 1., 5.], [2., 2., 5.], [3., 3., 1.]], [0., 0., 1.])
-# pickle.dump(reg_model, open('some_model.pkl', 'wb'))
+# load csv_detective info json
 
 app = Flask(__name__)
 
@@ -33,8 +28,6 @@ def get_prediction():
     r = requests.get(resource_url, allow_redirects=True, timeout=5)
     resource_content = r.content
 
-    y_pred, csv_info = get_columns_prediction("03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
-    dict_columns = get_columns_types(y_pred, csv_info)
 
 
     # prediction = ML_PIPELINE.predict([[feature1, feature2, feature3]])
