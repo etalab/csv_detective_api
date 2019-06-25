@@ -1,10 +1,28 @@
-FROM tiangolo/uwsgi-nginx-flask:python3.6
+FROM continuumio/miniconda3
 
-WORKDIR /app/
+COPY . /app
 
-COPY requirements.txt /app/
-RUN pip install -r ./requirements.txt
+WORKDIR /app
 
-ENV ENVIRONMENT production
+RUN  apt-get update -y
 
-COPY main.py __init__.py /app/
+RUN  apt-get install build-essential -y
+
+RUN  apt-get install unzip
+
+RUN  conda env update --file environment.yml
+
+RUN  wget https://codeload.github.com/psorianom/csv_detective/zip/parse_table_modified
+
+RUN  unzip parse_table_modified
+
+RUN  cd csv_detective-parse_table_modified
+
+
+EXPOSE 5000
+
+ENTRYPOINT ["/opt/conda/envs/csv/bin/python"]
+
+RUN pip install -e /app/csv_detective-parse_table_modified
+
+CMD ["main.py"]

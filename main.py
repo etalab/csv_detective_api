@@ -11,8 +11,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 
-
-
 app = Flask(__name__)
 
 
@@ -46,7 +44,10 @@ if __name__ == '__main__':
         logger.error("JSON data file not found.".format(fn))
         raise
 
-    if os.environ['ENVIRONMENT'] == 'production':
-        app.run(port=80, host='0.0.0.0')
-    if os.environ['ENVIRONMENT'] == 'local':
+    if 'ENVIRONMENT' in os.environ:
+        if os.environ['ENVIRONMENT'] == 'production':
+            app.run(port=80, host='0.0.0.0')
+        if os.environ['ENVIRONMENT'] == 'local':
+            app.run(port=5000, host='0.0.0.0')
+    else:
         app.run(port=5000, host='0.0.0.0')
