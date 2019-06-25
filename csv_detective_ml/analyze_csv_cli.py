@@ -78,7 +78,7 @@ if __name__ == '__main__':
                     for f in tqdm(list_files)]
 
     logger.info("Saving info to JSON")
-    json.dump(dict(csv_info), open("../csv_data.json", "w"))
+    json.dump(dict(csv_info), open("./csv_data.json", "w"))
     pass
 
 

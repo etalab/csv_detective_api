@@ -1,19 +1,19 @@
 #!flask/bin/python
+import os
 
-import requests
 from flask import Flask
 from flask import request
+from flask import jsonify
 import logging
+import json
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 
 
-# load csv_detective info json
 
 app = Flask(__name__)
-
 
 
 @app.route('/isAlive')
@@ -21,26 +21,32 @@ def index():
     return "true"
 
 
-@app.route('/prediction/api/v1.0/csv_detective', methods=['GET'])
+@app.route('/csv_detective', methods=['GET'])
 def get_prediction():
-    resource_id = float(request.args.get('resource_id'))
-    resource_url = "here some url"
-    r = requests.get(resource_url, allow_redirects=True, timeout=5)
-    resource_content = r.content
-
-
-
-    # prediction = ML_PIPELINE.predict([[feature1, feature2, feature3]])
-    # return str(prediction)
-    return
-
-
+    global CSV_INFO
+    try:
+        resource_id = request.args.get('resource_id')
+        if resource_id in CSV_INFO:
+            return jsonify(CSV_INFO[resource_id])
+        else:
+            logger.info("Resource id not found in 'database'.")
+            return jsonify({"not_found": True})
+    except:
+        return "Send some value as resource_id"
 
 
 if __name__ == '__main__':
-    pass
-    # if os.environ['ENVIRONMENT'] == 'production':
-    #     app.run(port=80, host='0.0.0.0')
-    # if os.environ['ENVIRONMENT'] == 'local':
-    #     app.run(port=5000, host='0.0.0.0')
+    # load csv_detective info json
+    CSV_INFO = {}
+    try:
+        with open("csv_data.json", "r") as filo:
+            logger.info("Loading JSON file with csv info...")
+            CSV_INFO = json.load(filo)
+    except FileNotFoundError as fn:
+        logger.error("JSON data file not found.".format(fn))
+        raise
 
+    if os.environ['ENVIRONMENT'] == 'production':
+        app.run(port=80, host='0.0.0.0')
+    if os.environ['ENVIRONMENT'] == 'local':
+        app.run(port=5000, host='0.0.0.0')
