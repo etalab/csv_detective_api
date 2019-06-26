@@ -7,8 +7,6 @@ import numpy as np
 import features
 
 
-
-
 class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
     """Extract the subject & body from a usenet post in a single pass.
 
@@ -40,16 +38,17 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
                 if any([x is None for x in header]):
                     return_dict = {'error': True}
                     return return_dict
-
-        table, total_lines = parse_table(
-            file_path,
-            encoding,
-            sep,
-            header_row_idx,
-            n_rows,
-            random_state=42
-        )
-
+        try:
+            table, total_lines = parse_table(
+                file_path,
+                encoding,
+                sep,
+                header_row_idx,
+                n_rows,
+                random_state=42
+            )
+        except Exception as e:
+            return
         if table.empty:
             print("Could not read {}".format(file_path))
             return
@@ -60,7 +59,7 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
         csv_df = self._load_file(file_path=file_path, n_rows=self.n_rows)
 
         if csv_df is None:
-            return None
+            return {"error": "Could not read file with pandas"}
 
         file_columns = []
         columns_names = []
@@ -113,11 +112,9 @@ def get_columns_types(y_pred, csv_info):
         u, counts = np.unique(list_predictions, return_counts=True)
         return u[0]
 
-
-
     from collections import OrderedDict
     num_columns = [len(f) for f in csv_info["per_file_rows"]][0]
-    assert(len(y_pred) == len(csv_info["all_headers"]))
+    assert (len(y_pred) == len(csv_info["all_headers"]))
     dict_columns = defaultdict(list)
     head_pred = list(zip(csv_info["all_headers"], y_pred))
     for header in csv_info["headers"]:
@@ -130,6 +127,7 @@ def get_columns_types(y_pred, csv_info):
                 continue
             dict_columns[header].append(most_freq_label)
     return dict_columns
+
 
 # y_pred, csv_info = get_columns_prediction("03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
 # dict_columns = get_columns_types(y_pred, csv_info)
