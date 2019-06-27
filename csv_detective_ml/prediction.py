@@ -81,22 +81,12 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
 
         return datasets_info
 
-    def _extract_columns_selector(self, csv_path):
-        """
-        Choses the path of execution, either parallel or single core
-        :param csv_folder:
-        :return:
-        """
-        csv_info = self._extract_columns(csv_path)
-
-        return csv_info
-
     def transform(self, csv_path):
-        columns_info = self._extract_columns_selector(csv_path)
+        columns_info = self._extract_columns(csv_path)
         return columns_info
 
 
-def get_columns_prediction(csv_path, pipeline):
+def get_columns_ML_prediction(csv_path, pipeline):
     ext = PredictColumnInfoExtractor()
     csv_info = ext.transform(csv_path)
     if not csv_info:

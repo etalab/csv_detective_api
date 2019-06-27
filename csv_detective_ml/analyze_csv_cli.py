@@ -25,7 +25,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 
-from prediction import get_columns_prediction, get_columns_types
+from prediction import get_columns_ML_prediction, get_columns_types
 from utils import extract_id, get_files
 ML_PIPELINE = None
 
@@ -34,28 +34,25 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None):
     dict_result = {}
     logger.info(" csv_detective on {}".format(file_path))
 
-    if analysis_type == "both" or analysis_type == "rule":
-        try:
+    try:
+        if analysis_type == "both" or analysis_type == "rule":
             dict_result = routine(file_path, num_rows=100)
-        except Exception as e:
+
+            if "columns" in dict_result:
+                dict_result["columns_rb"] = dict_result["columns"]
+                dict_result.pop("columns")
+        else:
+            # Get ML tagging
+            dict_result = routine(file_path, num_rows=100, user_input_tests=None)
+
+        if analysis_type != "rule":
+            assert pipeline is not None
+            y_pred, csv_info = get_columns_ML_prediction(file_path, pipeline)
+            dict_result["columns_ml"] = get_columns_types(y_pred, csv_info)
+
+    except Exception as e:
             logger.debug("Analyzing file {0} failed with {1}".format(file_path, e))
             return extract_id(file_path), {"status": "Failed to analyze this file with csv_detective. Is it a csv?"}
-
-        if "columns" in dict_result:
-            dict_result["columns_rb"] = dict_result["columns"]
-            dict_result.pop("columns")
-    else:
-        # Get ML tagging
-        try:
-            dict_result = routine(file_path, num_rows=100, user_input_tests=None)
-        except Exception as e:
-            logger.debug("Analyzing file {0} failed with {1}".format(file_path, e))
-            return extract_id(file_path), dict_result
-
-    if analysis_type != "rule":
-        assert pipeline is not None
-        y_pred, csv_info = get_columns_prediction(file_path, pipeline)
-        dict_result["columns_ml"] = get_columns_types(y_pred, csv_info)
 
     return extract_id(file_path), dict_result
 
