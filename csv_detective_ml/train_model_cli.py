@@ -82,7 +82,7 @@ if __name__ == '__main__':
         )),
 
         # Use a SVC classifier on the combined features
-        ('XG', XGBClassifier(n_jobs=5)),
+        ('XG', XGBClassifier(n_jobs=n_cores)),
 
     ])
 
