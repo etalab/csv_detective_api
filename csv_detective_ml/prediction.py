@@ -86,8 +86,8 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
         return columns_info
 
 
-def get_columns_ML_prediction(csv_path, pipeline):
-    ext = PredictColumnInfoExtractor()
+def get_columns_ML_prediction(csv_path, pipeline, num_rows=500):
+    ext = PredictColumnInfoExtractor(num_rows=num_rows)
     csv_info = ext.transform(csv_path)
     if not csv_info:
         # logger.error("Could not read {}".format(csv_path))

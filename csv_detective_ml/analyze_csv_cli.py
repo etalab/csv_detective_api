@@ -9,7 +9,7 @@ Arguments:
     <i>                                An input directory with csvs(if dir it will convert all txt files inside).
     --analysis_type ANAL_TYPE          The type of column type analysis: rule, mlearning, both [default: "both":str]
     --num_files NFILES                 Number of files (CSVs) to work with [default: 10:int]
-    --num_rows NROWS                   Number of rows per file to use [default: 200:int]
+    --num_rows NROWS                   Number of rows per file to use [default: 500:int]
     --num_cores=<n> CORES                  Number of cores to use [default: 1:int]
 '''
 import json
@@ -30,24 +30,24 @@ from utils import extract_id, get_files
 ML_PIPELINE = None
 
 
-def analyze_csv(file_path, analysis_type="both", pipeline=None):
+def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500):
     dict_result = {}
     logger.info(" csv_detective on {}".format(file_path))
 
     try:
         if analysis_type == "both" or analysis_type == "rule":
-            dict_result = routine(file_path, num_rows=100)
+            dict_result = routine(file_path, num_rows=num_rows)
 
             if "columns" in dict_result:
                 dict_result["columns_rb"] = dict_result["columns"]
                 dict_result.pop("columns")
         else:
             # Get ML tagging
-            dict_result = routine(file_path, num_rows=100, user_input_tests=None)
+            dict_result = routine(file_path, num_rows=num_rows, user_input_tests=None)
 
         if analysis_type != "rule":
             assert pipeline is not None
-            y_pred, csv_info = get_columns_ML_prediction(file_path, pipeline)
+            y_pred, csv_info = get_columns_ML_prediction(file_path, pipeline, num_rows=num_rows)
             dict_result["columns_ml"] = get_columns_types(y_pred, csv_info)
 
     except Exception as e:
@@ -73,10 +73,10 @@ if __name__ == '__main__':
 
     if n_jobs and n_jobs > 1:
         csv_info = Parallel(n_jobs=n_jobs)(
-            delayed(analyze_csv)(file_path, analysis_type=analysis_type, pipeline=ML_PIPELINE)
+            delayed(analyze_csv)(file_path, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=num_rows)
             for file_path in tqdm(list_files))
     else:
-        csv_info = [analyze_csv(f, analysis_type=analysis_type, pipeline=ML_PIPELINE)
+        csv_info = [analyze_csv(f, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=num_rows)
                     for f in tqdm(list_files)]
 
     logger.info("Saving info to JSON")
