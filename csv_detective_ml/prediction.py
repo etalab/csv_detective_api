@@ -87,7 +87,7 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
 
 
 def get_columns_ML_prediction(csv_path, pipeline, num_rows=500):
-    ext = PredictColumnInfoExtractor(num_rows=num_rows)
+    ext = PredictColumnInfoExtractor(n_rows=num_rows)
     csv_info = ext.transform(csv_path)
     if not csv_info:
         # logger.error("Could not read {}".format(csv_path))
@@ -100,6 +100,7 @@ def get_columns_ML_prediction(csv_path, pipeline, num_rows=500):
 def get_columns_types(y_pred, csv_info):
     def get_most_frequent(list_predictions):
         u, counts = np.unique(list_predictions, return_counts=True)
+        print(u, counts)
         return u[0]
 
     from collections import OrderedDict
@@ -107,18 +108,22 @@ def get_columns_types(y_pred, csv_info):
     assert (len(y_pred) == len(csv_info["all_headers"]))
     dict_columns = defaultdict(list)
     head_pred = list(zip(csv_info["all_headers"], y_pred))
+    per_header_predictions = defaultdict(list)
+    for v in head_pred:
+        per_header_predictions[v[0]].append(v[1])
     for header in csv_info["headers"]:
-        per_head_predictions = [f[1] for f in head_pred if f[0] == header.lower()]
-        if not per_head_predictions:
+        if not per_header_predictions[header.lower()]:
             continue
         else:
-            most_freq_label = get_most_frequent(per_head_predictions)
+            most_freq_label = get_most_frequent(per_header_predictions[header.lower()])
             if most_freq_label == "O":
                 continue
             dict_columns[header].append(most_freq_label)
     return dict_columns
 
+import joblib
 
-# y_pred, csv_info = get_columns_prediction("03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
-# dict_columns = get_columns_types(y_pred, csv_info)
-pass
+pp = joblib.load("models/model.joblib")
+y_pred, csv_info = get_columns_ML_prediction("/home/pavel/temp/1614614e-44f8-4ee6-8e1a-24c172c596e2.csv", pipeline=pp)
+dict_columns = get_columns_types(y_pred, csv_info)
+print(dict_columns)
