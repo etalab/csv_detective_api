@@ -18,6 +18,7 @@ from argopt import argopt
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer, HashingVectorizer
 from sklearn.metrics import classification_report
+from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
 from xgboost import XGBClassifier
 
@@ -49,18 +50,18 @@ if __name__ == '__main__':
         ('union', FeatureUnion(
             transformer_list=[
 
-                # Pipeline for pulling custom features from the columns
-                ('custom_features', Pipeline([
-                    ('selector', ItemSelector(key='per_file_rows')),
-                    ('customfeatures', CustomFeatures(n_jobs=n_cores)),
-                    ("customvect", DictVectorizer())
-                ])),
-
-                # Pipeline for standard bag-of-words models for cell values
-                ('cell_features', Pipeline([
-                    ('selector', ItemSelector(key='all_columns')),
-                    ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
-                ])),
+                # # Pipeline for pulling custom features from the columns
+                # ('custom_features', Pipeline([
+                #     ('selector', ItemSelector(key='per_file_rows')),
+                #     ('customfeatures', CustomFeatures(n_jobs=n_cores)),
+                #     ("customvect", DictVectorizer())
+                # ])),
+                #
+                # # Pipeline for standard bag-of-words models for cell values
+                # ('cell_features', Pipeline([
+                #     ('selector', ItemSelector(key='all_columns')),
+                #     ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
+                # ])),
 
                 # Pipeline for standard bag-of-words models for header values
                 ('header_features', Pipeline([
@@ -82,7 +83,8 @@ if __name__ == '__main__':
         )),
 
         # Use a SVC classifier on the combined features
-        ('XG', XGBClassifier(n_jobs=n_cores)),
+        # ('XG', XGBClassifier(n_jobs=n_cores)),
+        ("MLP", MLPClassifier((512, ), activation="logistic")),
 
     ])
 

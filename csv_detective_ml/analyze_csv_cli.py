@@ -39,6 +39,7 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500):
             dict_result = routine(file_path, num_rows=num_rows)
 
             if "columns" in dict_result:
+                dict_result["columns"] = {k.strip('"'): v for k, v in dict_result["columns"].items()}
                 dict_result["columns_rb"] = dict_result["columns"]
                 dict_result.pop("columns")
         else:
@@ -51,7 +52,7 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500):
             dict_result["columns_ml"] = get_columns_types(y_pred, csv_info)
 
     except Exception as e:
-            logger.debug("Analyzing file {0} failed with {1}".format(file_path, e))
+            logger.info("Analyzing file {0} failed with {1}".format(file_path, e))
             return extract_id(file_path), {"status": "Failed to analyze this file with csv_detective. Is it a csv?"}
 
     return extract_id(file_path), dict_result
