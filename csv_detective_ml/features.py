@@ -263,9 +263,9 @@ class CustomFeatures(BaseEstimator, TransformerMixin):
             for i, value in enumerate(rows):
                 # Add column features if existent
                 features = {}
-                if len(numeric_col):
-                    features["num_unique"] = len(set("".join(rows)))
-                    features["col_sum"] = 1 if sum(numeric_col) < len(numeric_col) else 0
+                # if len(numeric_col):
+                #     features["num_unique"] = len(set("".join(rows)))
+                #     features["col_sum"] = 1 if sum(numeric_col) < len(numeric_col) else 0
                     # features["num_unique"] = len(np.unique(numeric_col))
                     # features["col_sum"] = 1 if sum(numeric_col) < len(numeric_col) else 0
 
@@ -279,10 +279,10 @@ class CustomFeatures(BaseEstimator, TransformerMixin):
                 #     np.random.shuffle(column_next)
                     # features[str(hash("".join(column_next)) % (10 ** 2))] = 1
                 #
-                columns_copy = rows_values[j][:]
-                np.random.shuffle(columns_copy)
+                # columns_copy = rows_values[j][:]
+                # np.random.shuffle(columns_copy)
 
-                features[str(hash("".join(columns_copy)) % (10 ** 3))] = 1
+                # features[str(hash("".join(columns_copy)) % (10 ** 3))] = 1
 
                 # features["is_numeric"] = 1 if value.isnumeric() or is_float(value) else 0
                 # features["single_char"] = 1 if len(value.strip()) == 1 else 0
