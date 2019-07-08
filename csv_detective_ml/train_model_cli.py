@@ -17,6 +17,7 @@ import joblib
 from argopt import argopt
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer, HashingVectorizer
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
@@ -66,8 +67,8 @@ if __name__ == '__main__':
                 # Pipeline for standard bag-of-words models for header values
                 ('header_features', Pipeline([
                     ('selector', ItemSelector(key='all_headers')),
-                    # ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
-                    ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(1, 3), analyzer="char_wb")),
+                    ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
+                    # ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(1, 3), analyzer="char_wb")),
 
                 ])),
 
@@ -83,8 +84,9 @@ if __name__ == '__main__':
         )),
 
         # Use a SVC classifier on the combined features
-        # ('XG', XGBClassifier(n_jobs=n_cores)),
-        ("MLP", MLPClassifier((512, ), solver="adam")),
+        ('XG', XGBClassifier(n_jobs=n_cores)),
+        # ("MLP", MLPClassifier((512, ), solver="adam"))
+        # ("LR", LogisticRegression()),
 
     ])
 
@@ -99,7 +101,7 @@ if __name__ == '__main__':
         print(classification_report(y_test, y_pred=y_pred))
 
     # Save pipeline
-    joblib.dump(pipeline, output_model_path + '/model.joblib')
+    # joblib.dump(pipeline, output_model_path + '/model.joblib')
 
     # from prediction import PredictColumnInfoExtractor
     #

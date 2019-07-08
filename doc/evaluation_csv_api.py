@@ -73,12 +73,6 @@ print(classification_report(df_annotations.human_detected.fillna("O"), df_annota
 # In[7]:
 
 
-ordered_ids = df_annotations.id.unique()
-print(len(ordered_ids))
-
-
-# In[45]:
-
 
 json_csv_detective = json.load(open("csv_data.json"))
 
