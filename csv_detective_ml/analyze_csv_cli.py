@@ -53,7 +53,7 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500):
 
     except Exception as e:
             logger.info("Analyzing file {0} failed with {1}".format(file_path, e))
-            return extract_id(file_path), {"status": "Failed to analyze this file with csv_detective. Is it a csv?"}
+            return extract_id(file_path), {"status": "{}".format(e)}
 
     return extract_id(file_path), dict_result
 
