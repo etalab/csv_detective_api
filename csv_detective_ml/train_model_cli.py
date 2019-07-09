@@ -84,8 +84,8 @@ if __name__ == '__main__':
         )),
 
         # Use a SVC classifier on the combined features
-        # ('XG', XGBClassifier(n_jobs=n_cores)),
-        ("MLP", MLPClassifier((512, ), solver="adam"))
+        ('XG', XGBClassifier(n_jobs=n_cores)),
+        # ("MLP", MLPClassifier((512, ))),
         # ("LR", LogisticRegression()),
 
     ])
