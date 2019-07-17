@@ -27,8 +27,11 @@ def visualize_multivariate(X, y):
     plt.show()
 
 
-def get_files(data_path, ext="csv"):
-    return glob.glob(data_path + "/*.{}".format(ext))
+def get_files(data_path, ext="csv", sample=None):
+    files = glob.glob(data_path + "/*.{}".format(ext))
+    if sample:
+        return list(np.random.choice(files, sample, replace=False))
+    return files
 
 
 def extract_id(file_path):

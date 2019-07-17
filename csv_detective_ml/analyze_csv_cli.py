@@ -70,7 +70,7 @@ if __name__ == '__main__':
         ML_PIPELINE = joblib.load('csv_detective_ml/models/model.joblib')
 
     # list_files = ["03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv"]
-    list_files = get_files(csv_folder_path)
+    list_files = get_files(csv_folder_path, sample=7000)
 
     if n_jobs and n_jobs > 1:
         csv_info = Parallel(n_jobs=n_jobs)(
@@ -81,7 +81,7 @@ if __name__ == '__main__':
                     for f in tqdm(list_files)]
 
     logger.info("Saving info to JSON")
-    json.dump(dict(csv_info), open("./csv_data.json", "w"))
+    json.dump(dict(csv_info), open("./csv_data_lamadre.json", "w"))
     pass
 
 

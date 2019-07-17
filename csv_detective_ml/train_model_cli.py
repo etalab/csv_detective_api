@@ -58,28 +58,29 @@ if __name__ == '__main__':
                     ("customvect", DictVectorizer())
                 ])),
                 #
-                # # Pipeline for standard bag-of-words models for cell values
-                # ('cell_features', Pipeline([
-                #     ('selector', ItemSelector(key='all_columns')),
-                #     ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
-                # ])),
+                # Pipeline for standard bag-of-words models for cell values
+                ('cell_features', Pipeline([
+                    ('selector', ItemSelector(key='all_columns')),
+                    ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000,
+                                              strip_accents="unicode")),
+                ])),
 
                 # Pipeline for standard bag-of-words models for header values
                 ('header_features', Pipeline([
                     ('selector', ItemSelector(key='all_headers')),
-                    ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
-                    # ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(1, 3), analyzer="char_wb")),
+                    ('count', CountVectorizer(ngram_range=(3, 3), analyzer="char_wb", binary=False, max_features=2000)),
+                    #('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(3, 3), analyzer="char_wb", strip_accents="unicode")),
 
                 ])),
 
             ],
 
             # weight components in FeatureUnion
-            # transformer_weights={
-            #     'column_custom': .499,
-            #     'cell_bow': .499,
-            #     'header_bow': 0.02,
-            # },
+             transformer_weights={
+                 'custom_features': .6,
+                 'cell_features': 1.1,
+                 'header_features': 0.3,
+             },
 
         )),
 
