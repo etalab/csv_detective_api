@@ -65,7 +65,7 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
         columns_names = []
         for j in range(len(csv_df.columns)):
             # Get all values of the column j and clean it a little bit
-            temp_list = csv_df.iloc[:, j].dropna().apply(lambda x: x.replace(" ", "")).to_list()
+            temp_list = csv_df.iloc[:, j].dropna().apply(lambda x: x.replace(" ", " ")).to_list()
             file_columns.append(temp_list)
             columns_names.extend([csv_df.columns[j].lower()] * len(temp_list))
 
@@ -121,9 +121,16 @@ def get_columns_types(y_pred, csv_info):
             dict_columns[header].append(most_freq_label)
     return dict_columns
 
-import joblib
 
 # pp = joblib.load("models/model.joblib")
 # y_pred, csv_info = get_columns_ML_prediction("/home/pavel/temp/1614614e-44f8-4ee6-8e1a-24c172c596e2.csv", pipeline=pp)
 # dict_columns = get_columns_types(y_pred, csv_info)
 # print(dict_columns)
+if __name__ == '__main__':
+
+    import joblib
+    
+    pp = joblib.load("models/model.joblib")
+    y_pred, csv_info = get_columns_ML_prediction("/home/pavel/84136fe7-3aea-4496-a06b-d13ca90cba47.csv", pipeline=pp)
+    dict_columns = get_columns_types(y_pred, csv_info)
+    print(dict_columns)

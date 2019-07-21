@@ -13,13 +13,10 @@ Arguments:
     --train_size TRAIN                 Percentage for training . If 1.0, then no testing is done [default: 0.7:float]
 '''
 # import logging
-import joblib
 from argopt import argopt
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.feature_extraction.text import CountVectorizer, HashingVectorizer
-from sklearn.linear_model import LogisticRegression
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import classification_report
-from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
 from xgboost import XGBClassifier
 
@@ -27,9 +24,8 @@ from xgboost import XGBClassifier
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler())
 from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
-
 # from prediction import PredictColumnInfoExtractor
-
+from utils import header_tokenizer
 
 if __name__ == '__main__':
     parser = argopt(__doc__).parse_args()
@@ -63,6 +59,7 @@ if __name__ == '__main__':
                     ('selector', ItemSelector(key='all_columns')),
                     ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000,
                                               strip_accents="unicode")),
+                    ('count', TfidfVectorizer(ngram_range=(1, 1), analyzer="char_wb", binary=False, max_features=2000)),
                 ])),
 
                 # Pipeline for standard bag-of-words models for header values
@@ -70,17 +67,20 @@ if __name__ == '__main__':
                     ('selector', ItemSelector(key='all_headers')),
                     ('count', CountVectorizer(ngram_range=(3, 3), analyzer="char_wb", binary=False, max_features=2000)),
                     #('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(3, 3), analyzer="char_wb", strip_accents="unicode")),
+                    ('count', TfidfVectorizer(ngram_range=(1, 3), analyzer=header_tokenizer,
+                                              binary=False, max_features=2000)),
+                    # ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(1, 3), analyzer="char_wb")),
 
                 ])),
 
             ],
 
             # weight components in FeatureUnion
-             transformer_weights={
-                 'custom_features': .6,
-                 'cell_features': 1.1,
-                 'header_features': 0.3,
-             },
+            #  transformer_weights={
+            #      'custom_features': .6,
+            #      'cell_features': 1.1,
+            #      'header_features': 0.3,
+            #  },
 
         )),
 
