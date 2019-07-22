@@ -38,3 +38,8 @@ def extract_id(file_path):
     import os
     resource_id = os.path.basename(file_path)[:-4]
     return resource_id
+
+
+def header_tokenizer(x):
+    import re
+    return re.split(r"[\s_]]+", x)
