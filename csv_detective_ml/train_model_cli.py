@@ -13,9 +13,10 @@ Arguments:
     --train_size TRAIN                 Percentage for training . If 1.0, then no testing is done [default: 0.7:float]
 '''
 # import logging
+import joblib
 from argopt import argopt
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
 from sklearn.metrics import classification_report
 from sklearn.pipeline import Pipeline, FeatureUnion
 from xgboost import XGBClassifier
@@ -57,19 +58,15 @@ if __name__ == '__main__':
                 # Pipeline for standard bag-of-words models for cell values
                 ('cell_features', Pipeline([
                     ('selector', ItemSelector(key='all_columns')),
-                    ('count', CountVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000,
-                                              strip_accents="unicode")),
-                    ('count', TfidfVectorizer(ngram_range=(1, 1), analyzer="char_wb", binary=False, max_features=2000)),
+                    ('count', TfidfVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
                 ])),
 
                 # Pipeline for standard bag-of-words models for header values
                 ('header_features', Pipeline([
                     ('selector', ItemSelector(key='all_headers')),
-                    ('count', CountVectorizer(ngram_range=(3, 3), analyzer="char_wb", binary=False, max_features=2000)),
-                    #('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(3, 3), analyzer="char_wb", strip_accents="unicode")),
                     ('count', TfidfVectorizer(ngram_range=(1, 3), analyzer=header_tokenizer,
                                               binary=False, max_features=2000)),
-                    # ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(1, 3), analyzer="char_wb")),
+                    # ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(3, 3), analyzer="char_wb")),
 
                 ])),
 
@@ -102,7 +99,7 @@ if __name__ == '__main__':
         print(classification_report(y_test, y_pred=y_pred))
 
     # Save pipeline
-    # joblib.dump(pipeline, output_model_path + '/model.joblib')
+    joblib.dump(pipeline, output_model_path + '/model.joblib')
 
     # from prediction import PredictColumnInfoExtractor
     #

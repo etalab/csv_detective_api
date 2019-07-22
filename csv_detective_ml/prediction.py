@@ -81,8 +81,9 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
 
         return datasets_info
 
-    def transform(self, csv_path):
-        columns_info = self._extract_columns(csv_path)
+    def transform(self, csv_paths):
+
+        columns_info = self._extract_columns(csv_paths)
         return columns_info
 
 
