@@ -9,9 +9,7 @@ def run():
     normal_types = ["commune", "departement", "region", "siret", "siren", "sexe"]
     code_types = ["postal", "departement", "region", "insee"]
 
-
-
-    csv_data : dict = json.load(open("/home/pavel/etalab/code/csv_detective_api/csv_data_full.json"))
+    csv_data: dict = json.load(open("/home/pavel/etalab/code/csv_detective_api/csv_data_full.json"))
     type_ids = defaultdict(list)
 
     for id, csv in csv_data.items():
@@ -26,11 +24,11 @@ def run():
             if "code" in temp:
                 for code_t in code_types:
                     if re.findall(r"{}\b".format(code_t), temp):
-                        type_ids[f'code_{code_t}'].append((temp, id))
+                        type_ids[f'code_{code_t}'].append((head.replace('"', ""), id))
             else:
                 for normal_t in normal_types:
                     if re.findall(r"{}\b".format(normal_t), temp):
-                        type_ids[normal_t].append((temp, id))
+                        type_ids[normal_t].append((head.replace('"', ""), id))
 
 
     # Now we create an annotation csv with a sample from each column:

@@ -65,7 +65,7 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
         columns_names = []
         for j in range(len(csv_df.columns)):
             # Get all values of the column j and clean it a little bit
-            temp_list = csv_df.iloc[:, j].dropna().apply(lambda x: x.replace(" ", " ")).to_list()
+            temp_list = csv_df.iloc[:, j].dropna().to_list()
             file_columns.append(temp_list)
             columns_names.extend([csv_df.columns[j].lower()] * len(temp_list))
 

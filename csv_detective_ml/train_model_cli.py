@@ -17,6 +17,7 @@ import joblib
 from argopt import argopt
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.pipeline import Pipeline, FeatureUnion
 from xgboost import XGBClassifier
@@ -64,29 +65,34 @@ if __name__ == '__main__':
                 # Pipeline for standard bag-of-words models for header values
                 ('header_features', Pipeline([
                     ('selector', ItemSelector(key='all_headers')),
-                    ('count', TfidfVectorizer(ngram_range=(1, 3), analyzer=header_tokenizer,
-                                              binary=False, max_features=2000)),
-                    # ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(3, 3), analyzer="char_wb")),
+                    # ('count', TfidfVectorizer(ngram_range=(4, 4), analyzer="char_wb",
+                    #                           binary=False, max_features=2000)),
+                    ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(3, 3), analyzer="char_wb")),
 
                 ])),
 
             ],
 
             # weight components in FeatureUnion
-            #  transformer_weights={
-            #      'custom_features': .6,
-            #      'cell_features': 1.1,
-            #      'header_features': 0.3,
-            #  },
+              transformer_weights={
+                  'custom_features': 1.6,
+                  'cell_features': 1,
+                  'header_features': .6,
+              },
 
         )),
 
         # Use a SVC classifier on the combined features
         ('XG', XGBClassifier(n_jobs=n_cores)),
         # ("MLP", MLPClassifier((512, ))),
-        # ("LR", LogisticRegression()),
+        # ("LR", LogisticRegression(n_jobs=n_cores, solver="liblinear", multi_class="auto", class_weight="balanced")),
 
     ])
+
+    test_distant, _ = ColumnInfoExtractor(n_files=10, n_rows=num_rows, train_size=1.0,
+                                        n_jobs=n_cores, column_sample=True).transform(
+         annotations_file="./data/distant_annotation.csv",
+         csv_folder="/data/datagouv/datagouv_full")
 
     train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
                                       n_jobs=n_cores).transform(annotations_file=tagged_file_path,
@@ -96,6 +102,12 @@ if __name__ == '__main__':
     if test is not None:
         y_test = test["y"]
         y_pred = pipeline.predict(test)
+        print(classification_report(y_test, y_pred=y_pred))
+
+    if test_distant is not None:
+        print("\n\nTEST DISTANT\n\n")
+        y_test = test_distant["y"]
+        y_pred = pipeline.predict(test_distant)
         print(classification_report(y_test, y_pred=y_pred))
 
     # Save pipeline

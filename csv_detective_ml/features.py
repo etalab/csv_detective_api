@@ -67,7 +67,8 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
     `subject` and `body`.
     """
 
-    def __init__(self, n_files=None, n_rows=200, n_jobs=1, train_size=0.7, save_dataset=False):
+    def __init__(self, n_files=None, n_rows=200, n_jobs=1, train_size=0.7, save_dataset=False,
+                 column_sample=False):
 
         self.n_rows = n_rows
         self.n_files = n_files
@@ -75,6 +76,10 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
         self.save_dataset = save_dataset
         self.train_size = train_size
         self._file_idx = {}
+        # if we have an annotation file that do not cover all the columns of the csvs
+        self.column_sample = column_sample
+        self._dict_ids_labels = None
+        self._dict_ids_columns = {}
 
     def fit(self, X, y=None):
         return self
@@ -121,7 +126,7 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
 
         for i in range(df_annotation.shape[0]):
             dict_ids_labels.setdefault(df_annotation.iloc[i].id, []).append(df_annotation.iloc[i].human_detected)
-
+            self._dict_ids_columns.setdefault(df_annotation.iloc[i].id, []).append(df_annotation.iloc[i]["columns"])
         num_annotations_per_resource = df_annotation.groupby("id", sort=False).count()["columns"].to_dict()
         assert (all(True if list(dict_ids_labels.keys())[i] == list(num_annotations_per_resource.keys())[i] else False
                     for i in range(len(num_annotations_per_resource))))
@@ -132,13 +137,13 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
     def _extract_columns(self, file_path):
         csv_id = os.path.basename(file_path)[:-4]
         file_labels = self._dict_ids_labels[csv_id]
-
+        file_columns_d = self._dict_ids_columns[csv_id]
         csv_df = self._load_file(file_path=file_path, n_rows=self.n_rows)
 
         if csv_df is None:
             return None
 
-        if csv_df.shape[1] != len(file_labels):
+        if csv_df.shape[1] != len(file_labels) and not self.column_sample:
             print("Annotated number of columns does not match the number of columns in file {}. The csv parsing"
                   "does not match with that of the annotation file "
                   "(more or less columns found in the annotation file).".format(file_path))
@@ -159,11 +164,12 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
         for ds_type, df in dataset_type.items():
             file_columns = []
             columns_names = []
-            for j in range(len(df.columns)):
+            # for j in range(len(df.columns)):
+            for col in file_columns_d:
                 # Get all values of the column j and clean it a little bit
-                temp_list = df.iloc[:, j].dropna().apply(lambda x: x.replace(" ", "")).to_list()
+                temp_list = df.loc[:, col].dropna().to_list()
                 file_columns.append(temp_list)
-                columns_names.extend([df.columns[j].lower()] * len(temp_list))
+                columns_names.extend([col] * len(temp_list))
 
             rows_labels = []
             rows_values = []
@@ -259,11 +265,13 @@ class CustomFeatures(BaseEstimator, TransformerMixin):
             return re.sub(r'[.,]', '', x, 1).isdigit() and len(re.findall(r"[.,]", x)) > 0
 
         for j, rows in enumerate(rows_values):
-            numeric_col = np.array([float(f.replace(",", ".")) for f in rows if f.isdigit() or is_float(f)], dtype=float)
+            # numeric_col = np.array([float(f.replace(",", ".")) for f in rows if f.isdigit() or is_float(f)], dtype=float)
             for i, value in enumerate(rows):
                 # Add column features if existent
                 features = {}
+                features["is_float"] = is_float(value)
                 # if len(numeric_col):
+
                 #     features["num_unique"] = len(set("".join(rows)))
                 #     features["col_sum"] = 1 if sum(numeric_col) < len(numeric_col) else 0
                     # features["num_unique"] = len(np.unique(numeric_col))
