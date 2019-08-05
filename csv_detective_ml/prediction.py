@@ -132,6 +132,6 @@ if __name__ == '__main__':
     import joblib
     
     pp = joblib.load("models/model.joblib")
-    y_pred, csv_info = get_columns_ML_prediction("/home/pavel/84136fe7-3aea-4496-a06b-d13ca90cba47.csv", pipeline=pp)
+    y_pred, csv_info = get_columns_ML_prediction("/home/pavel/7c952230-af2f-4e42-8490-285f2abe3875.csv", pipeline=pp)
     dict_columns = get_columns_types(y_pred, csv_info)
     print(dict_columns)

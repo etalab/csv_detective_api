@@ -19,6 +19,7 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
+from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
 from xgboost import XGBClassifier
 
@@ -77,22 +78,25 @@ if __name__ == '__main__':
               transformer_weights={
                   'custom_features': 1.6,
                   'cell_features': 1,
-                  'header_features': .6,
+                  'header_features': .3,
               },
 
         )),
 
         # Use a SVC classifier on the combined features
-        ('XG', XGBClassifier(n_jobs=n_cores)),
+        # ('XG', XGBClassifier(n_jobs=n_cores)),
         # ("MLP", MLPClassifier((512, ))),
-        # ("LR", LogisticRegression(n_jobs=n_cores, solver="liblinear", multi_class="auto", class_weight="balanced")),
+        ("LR", LogisticRegression(n_jobs=n_cores, solver="liblinear", multi_class="auto", class_weight="balanced")),
 
     ])
 
-    test_distant, _ = ColumnInfoExtractor(n_files=10, n_rows=num_rows, train_size=1.0,
-                                        n_jobs=n_cores, column_sample=True).transform(
-         annotations_file="./data/distant_annotation.csv",
-         csv_folder="/data/datagouv/datagouv_full")
+    try:
+        test_distant, _ = ColumnInfoExtractor(n_files=10, n_rows=num_rows, train_size=1.0,
+                                            n_jobs=n_cores, column_sample=True).transform(
+             annotations_file="./data/distant_annotation.csv",
+             csv_folder="/data/datagouv/datagouv_full")
+    except:
+        test_distant = None
 
     train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
                                       n_jobs=n_cores).transform(annotations_file=tagged_file_path,
