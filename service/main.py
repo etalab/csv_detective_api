@@ -11,6 +11,8 @@ from flask_restplus import Api, Resource, fields
 import logging
 import json
 
+from service.dgf_matcher.reference_matcher import link_reference_datasets
+
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 logger.addHandler(logging.StreamHandler())
@@ -20,6 +22,7 @@ api = Api(app=app,
           version="0.1",
           title="DGF Column Linker",
           description="Get the types contained in a DGF CSV file and link them to their respective reference dataset.")
+
 
 ns_csv_linker = api.namespace('csv_linker', description='Link CSVs')
 
@@ -41,25 +44,20 @@ model = api.model('Analysis parameters',
                   #                           description="Select 3",
                   #                           help="Select 3 cannot be blank")}
                   )
-
+CSV_INFO = {}
 
 @ns_csv_linker.route("/")
 class CSVLinker(Resource):
-    # def options(self):
-    #     response = make_response()
-    #     response.headers.add("Access-Control-Allow-Origin", "*")
-    #     response.headers.add('Access-Control-Allow-Headers', "Content-Type")
-    #     response.headers.add('Access-Control-Allow-Methods', "*")
-    #     return response
-
-    # @cors.crossdomain(origin='*')
     @api.expect(model)
     def get(self):
         global CSV_INFO
         try:
             resource_id = request.args.get('resource_id')
             if resource_id in CSV_INFO:
-                return jsonify(CSV_INFO[resource_id])
+                response = CSV_INFO[resource_id]
+                response = reformat_response(response)
+                response = link_reference_datasets(response)
+                return jsonify(response)
             else:
                 logger.info("Resource id not found in 'database'.")
                 return jsonify({"error": "ID {} not found".format(resource_id)})
@@ -82,44 +80,6 @@ def after_request(response):
     return response
 
 
-CSV_INFO = {}
-
-
-#
-# @app.route('/csv_detective', methods=['GET'])
-# def get_prediction():
-#     global CSV_INFO
-#     try:
-#         resource_id = request.args.get('resource_id')
-#         if resource_id in CSV_INFO:
-#             return jsonify(CSV_INFO[resource_id])
-#         else:
-#             logger.info("Resource id not found in 'database'.")
-#             return jsonify({"error": "ID {} not found".format(resource_id)})
-#     except Exception as e:
-#         return jsonify({"error": str(e)})
-#
-#
-# @app.route('/dgf_column_linker', methods=['GET'])
-# def dgf_column_linker():
-#     try:
-#         resource_id = request.args.get('resource_id')
-#         if resource_id in CSV_INFO:
-#             info_reformatted = {k: v for k, v in CSV_INFO[resource_id] if k not in ["columns_rb", "columns_ml"]}
-#             info_reformatted["metadata"] = info_reformatted
-#             for detection_type in ["columns_rb", "columns_ml"]:
-#                 if detection_type in CSV_INFO[resource_id]:
-#                     info_reformatted[detection_type] = CSV_INFO[resource_id][detection_type]
-#
-#             return jsonify(info_reformatted)
-#
-#         else:
-#             logger.info("Resource id not found in 'database'.")
-#             return jsonify({"error": "ID {} not found".format(resource_id)})
-#     except Exception as e:
-#         return jsonify({"error": str(e)})
-#
-
 def reformat_response(response):
     new_response = {}
     if "columns_rb" in response:
@@ -141,6 +101,7 @@ if __name__ == '__main__':
         with open("csv_data.json", "r") as filo:
             logger.info("Loading JSON file with csv info...")
             CSV_INFO = json.load(filo)
+
     except Exception as e:
         logger.error("Error reading JSON data file: {0}".format(str(e)))
         exit(1)
