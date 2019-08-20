@@ -11,7 +11,7 @@ from flask_restplus import Api, Resource, fields
 import logging
 import json
 
-from service.dgf_matcher.reference_matcher import link_reference_datasets
+from dgf_matcher.reference_matcher import link_reference_datasets
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
@@ -81,7 +81,8 @@ def after_request(response):
 
 
 def reformat_response(response):
-    new_response = {}
+    response = dict(response)
+    new_response = {}   
     if "columns_rb" in response:
         reformatted_rb = {k: v[0] for k, v in response["columns_rb"].items()}
         new_response["columns_rb"] = reformatted_rb

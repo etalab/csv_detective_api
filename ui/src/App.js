@@ -8,14 +8,9 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
-import Collapse from 'react-bootstrap/Collapse'
+import Collapse from 'react-bootstrap/Collapse';
+import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.css';
-
-// function modifi() {
-//   const greeting = 'Hello Function Component!';
-//   // this.state.result = "foook";
-//   return <h1>{greeting}</h1>;
-// }
 
 class App extends Component {
 
@@ -31,7 +26,7 @@ class App extends Component {
         select2: 1,
         select3: 1},
       open: false,
-      result: ""
+      result: null
     };
     this.handleChange = this.handleChange.bind(this);  
     this.handlePredictClick = this.handlePredictClick.bind(this);
@@ -49,10 +44,28 @@ class App extends Component {
     });
   }
 
+  handleCSVResponse = (response, detected_type) =>
+  {
+    if (!(detected_type in response))
+      return null
+    
+    return Object.entries(response[detected_type]).map((key, value) =>
+    {
+      return(
+      <tr>
+        <td>{key}</td><td>{value}</td>
+      </tr>
+      )
+    })
+  }
+
+
+
   handlePredictClick = (event) => {
     const formData = this.state.formData;
     // this.setState({ isLoading: true });
-    var result = "";
+    var response = "";
+    var result = ""
     this.setState({ open: !this.state.open});
     fetch(`http://127.0.0.1:5000/csv_linker/?resource_id=${formData.textfield1}`, 
       {
@@ -62,24 +75,26 @@ class App extends Component {
         },
         method: 'GET'
       })
-      .then(response => response.json())
-      .then(response => {
-        result = Object.keys(response).map((key, index) =>
-          {return(<p key={index}> This is my key {key} and this is value {response[key]}</p>)}
-        )
-      // this.setState({result: foo});
-      })
+      .then(response =>  response.json())
+      .then(response =>  {return Object.entries(response["columns_rb"]).map((key, value) =>
+        {
+          return(
+          <tr>
+            <td>{key}</td><td>{value}</td>
+          </tr>
+          )
+        })})
       .catch(console.log)
-    
-    // this.setState({result: result, isLoading: false})
-    console.log("this", this)
+    this.setState({result: result})
   }
   
   modifi() {
-    const greeting = 'Hello Function Component!';
-    this.setState({ result: "foook" });
+    // const greeting = 'Hello Function Component!';
+    // this.setState({ result: "foook" });
 
-    return <h1>{greeting}</h1>;
+    return (
+      <h5> OMG</h5>
+    );
   }
 
   render() {
@@ -87,8 +102,10 @@ class App extends Component {
     const formData = this.state.formData;
     const result = this.state.result;
     const open = this.state.open;
+    
     return (
-      <Container>
+
+    <Container>
         <div className="title">
           <h1>DGF Column Linker</h1>
         </div>
@@ -112,7 +129,7 @@ class App extends Component {
                   block
                   variant="success"
                   disabled={isLoading}
-                  onClick={!isLoading ? this.handlePredictClick.bind(this) : null}>
+                  onClick={!isLoading ? this.handlePredictClick : null}>
                   { isLoading ? 'Making analysis' : 'Analyze' }
               </Button>
             </Form.Group>
@@ -125,9 +142,24 @@ class App extends Component {
                 <Col><h3>Results</h3></Col>
             </Row>
             <Row>
-              <Form.Group as={Col}>
-
-              </Form.Group>
+              {
+                result === null ? (<h5>No results for this resource!</h5>) :
+                (
+                  <Table striped bordered hover size="sm">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Column Name</th>
+                      <th>Type Detected</th>
+                      <th>Reference Dataset</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {this.handleCSVResponse(result, "columns_rb")}
+                  </tbody>
+                </Table>
+                )
+              }
             </Row>
           </div>
         </Collapse>
@@ -148,14 +180,16 @@ class App extends Component {
             <h3>Performance</h3>
           </Col>
           </Row>
+          <Row>
+            {this.modifi()}
+          </Row>
         </div>
         {
-          result === "" ? null :
-            (<Row>
-              <Col className="result-container">
-                <h5 id="result">{result}</h5>
-              </Col>
-            </Row>)
+          //   (<Row>
+          //     <Col className="result-container">
+          //       <h5 id="result">{result}</h5>
+          //     </Col>
+            // </Row>)
         }
 
     </Container>
