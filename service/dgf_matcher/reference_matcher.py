@@ -1,30 +1,39 @@
 """
 Functions to match the contents (the columns) of a DGF CSV with their corresponding reference dataset.
 For the moment it is hard-coded. Maybe make the match in some intelligent way later??
+
+BAN : 0
+RAN : 1
+SUB: 2
+
 """
 from collections import defaultdict
 
 MATCH_DICT = {
-    "adresse": ["BAN"],
-    "code_commune_insee": ["BAN"],
-    "code_departement": ["BAN"],
-    "code_postal": ["BAN"],
-    "code_region": ["BAN"],
-    "commune": ["BAN"],
-    "siren": ["RNA", "SUB"],
-    "siret": ["RNA", "SUB"]
+    "adresse": [0],
+    "code_commune_insee": [0],
+    "code_departement": [0],
+    "code_postal": [0],
+    "code_region": [0],
+    "commune": [0],
+    "siren": [1, 2],
+    "siret": [1, 2]
 }
 
 REFERENCES_DICT = {
-    "BAN": {
+    0: {
+        "acronym": "BAN",
         "name": "Base Adresse Nationale",
         "url": "https://www.data.gouv.fr/en/datasets/base-adresse-nationale/"
     },
-    "RNA": {
+    1: {
+        "acronym": "RNA",
         "name": "Répertoire National des Associations",
         "url": "https://www.data.gouv.fr/en/datasets/repertoire-national-des-associations/"
     },
-    "SUB": {
+
+    2: {
+        "acronym": "SUB",
         "name": "Subventions",
         "url": "https://www.data.gouv.fr/en/search/?q=subventions"
     }
@@ -39,22 +48,26 @@ def link_reference_datasets(response, analysis_type="columns_rb"):
     :return:
     """
     if analysis_type in response:
-        column_types = [t for t in response[analysis_type].values()]
+        column_types = list(response[analysis_type].values())
         reference_datasets = get_reference_dataset(column_types)
-        response["reference_datasets"] = reference_datasets
+        response["reference_matched_datasets"] = {}
+        response["reference_matched_datasets"]["matched_datasets"] = reference_datasets
+        response["reference_matched_datasets"]["reference_datasets"] = REFERENCES_DICT
 
     return response
 
+
 def get_reference_dataset(column_types):
-    if not isinstance(column_types, list):
-        column_types = [column_types]
     reference_datasets = defaultdict(list)
     for tipo in column_types:
         if tipo not in MATCH_DICT:
             continue
-        references = MATCH_DICT[tipo]
-        for ref in references:
-            if ref not in REFERENCES_DICT:
-                continue
-            reference_datasets[tipo].append(REFERENCES_DICT[ref])
+        ref_ds_id = MATCH_DICT[tipo]
+        for id in ref_ds_id:
+            reference_datasets[id].append(tipo)
     return reference_datasets
+
+
+b = {"columns_rb": {"a": "adresse", "b": "code_departement", "s":"siren", "t":"siret"}}
+# b = {"columns_rb": {"a": "uai", "b": "nopo", "s":"foo", "t":"bar"}}
+print (link_reference_datasets(b))

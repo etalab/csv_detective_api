@@ -1,6 +1,3 @@
-
-import logo from './logo.svg';
-
 import React, { Component } from 'react';
 import './App.css';
 import Form from 'react-bootstrap/Form';
@@ -10,6 +7,7 @@ import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
 import Table from 'react-bootstrap/Table';
+import ReactJson from 'react-json-view';
 import 'bootstrap/dist/css/bootstrap.css';
 
 class App extends Component {
@@ -26,7 +24,7 @@ class App extends Component {
         select2: 1,
         select3: 1},
       open: false,
-      result: null
+      result: ""
     };
     this.handleChange = this.handleChange.bind(this);  
     this.handlePredictClick = this.handlePredictClick.bind(this);
@@ -44,28 +42,48 @@ class App extends Component {
     });
   }
 
+  // getRreferenceDatesets = (referenceDatasets)
+
   handleCSVResponse = (response, detected_type) =>
   {
     if (!(detected_type in response))
       return null
     
-    return Object.entries(response[detected_type]).map((key, value) =>
+    return Object.entries(response[detected_type]).map((key_value, index) =>
     {
       return(
-      <tr>
-        <td>{key}</td><td>{value}</td>
+      <tr key={index}>
+        <td>{key_value[0]}</td>
+        <td>{key_value[1]}</td>
       </tr>
       )
     })
   }
 
+  getReferenceDatasets = (response) =>
+  {
+    let reference_datasets = response.reference_matched_datasets["reference_datasets"];
+    let matched_datasets = response.reference_matched_datasets["matched_datasets"]
 
+    return Object.entries(matched_datasets).map((key_value) =>
+    {
+      let ref_ds_id = key_value[0];  // this is an int
+      let col_types = key_value[1];  // this is a list
+      let col_types_str = col_types.join(", ");
+      let column_type_str = (col_types.length === 1) ? "type" : "types";
+      let ref_dataset = reference_datasets[ref_ds_id]
+      return(
+        <p>The column {column_type_str} <b>{col_types_str}</b> could be referenced by the dataset <b><a href={ref_dataset["url"]}>{ref_dataset["name"]}</a></b>.</p>
+      )
+    }
+    )
+  }
 
   handlePredictClick = (event) => {
     const formData = this.state.formData;
     // this.setState({ isLoading: true });
     var response = "";
-    var result = ""
+    // var result = ""
     this.setState({ open: !this.state.open});
     fetch(`http://127.0.0.1:5000/csv_linker/?resource_id=${formData.textfield1}`, 
       {
@@ -76,16 +94,11 @@ class App extends Component {
         method: 'GET'
       })
       .then(response =>  response.json())
-      .then(response =>  {return Object.entries(response["columns_rb"]).map((key, value) =>
-        {
-          return(
-          <tr>
-            <td>{key}</td><td>{value}</td>
-          </tr>
-          )
-        })})
+      .then(result => this.setState({ result }))
       .catch(console.log)
-    this.setState({result: result})
+    console.log(this.state.result)
+    
+    
   }
   
   modifi() {
@@ -98,6 +111,7 @@ class App extends Component {
   }
 
   render() {
+    
     const isLoading = this.state.isLoading;
     const formData = this.state.formData;
     const result = this.state.result;
@@ -107,7 +121,7 @@ class App extends Component {
 
     <Container>
         <div className="title">
-          <h1>DGF Column Linker</h1>
+          <h5>CSV Detective API v0.1 (Updated 2019-08-21)</h5>
         </div>
         <div className="input_content">
         <Form>
@@ -136,22 +150,46 @@ class App extends Component {
           </Form.Row>
         </Form>
         </div>
+
         <Collapse in={open}>
-          <div className="results_content">
+        <div className="results_content">
             <Row>
-                <Col><h3>Results</h3></Col>
+                <Col><h3>Metadata</h3></Col>
             </Row>
             <Row>
               {
-                result === null ? (<h5>No results for this resource!</h5>) :
+                (() => {
+                  if (result !== "" && Object.keys(result["metadata"]).length !== 0)
+                  {
+                    return(
+                      <Col>
+                      <ReactJson src={result["metadata"]} collapsed={1} name={false} displayDataTypes={false} />
+                      </Col>
+
+                    )
+                  }
+                })()
+              }
+            </Row>
+        </div>
+        </Collapse>
+
+        <Collapse in={open}>
+          <div className="results_content">
+            <Row>
+                <Col><h3>Identified Columns</h3></Col>
+            </Row>
+            <Row>
+              <Col>
+              {
+                result === "" ? null :
                 (
-                  <Table striped bordered hover size="sm">
+                  <Table hover size="sm">
                   <thead>
                     <tr>
-                      <th>#</th>
                       <th>Column Name</th>
                       <th>Type Detected</th>
-                      <th>Reference Dataset</th>
+                      {/* <th>Reference Dataset</th> */}
                     </tr>
                   </thead>
                   <tbody>
@@ -160,9 +198,34 @@ class App extends Component {
                 </Table>
                 )
               }
+              </Col>
             </Row>
           </div>
         </Collapse>
+        
+        <Collapse in={open}>
+        <div className="results_content">
+            <Row>
+                <Col><h3>Reference Datasets</h3></Col>
+            </Row>
+            <Row>
+              {
+                (() => {
+                  if (result !== "" && Object.keys(result["reference_matched_datasets"]["matched_datasets"]).length !== 0)
+                  {
+                    return(
+                      <Col>
+                      {this.getReferenceDatasets(result)}
+                      </Col>
+
+                    )
+                  }
+                })()
+              }
+            </Row>
+        </div>
+        </Collapse>
+        
         <div className="description_content">
           <Row>
               <Col><h3>About</h3></Col>
@@ -196,25 +259,5 @@ class App extends Component {
     );
   }
 }
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
 
 export default App;

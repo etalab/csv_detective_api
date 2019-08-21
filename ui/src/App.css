@@ -11,13 +11,15 @@ html, body {
 }
 
 .title {
-  padding-top: 100px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   text-align: center;
   text-transform: uppercase;
   font-weight: 600;
   font-size: 4em;
   letter-spacing: 0.15rem;
   color: #fff;
+  /* background-color: ; */
 }
 
 .App-logo {
@@ -26,21 +28,11 @@ html, body {
   pointer-events: none;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
 
 .input_content {
   margin: auto;
   margin-top: 20px;
-  width: 70%;
+  width: 90%;
   height: auto;
   background-color: #fff;
   padding: 20px;
@@ -50,7 +42,7 @@ html, body {
 .results_content {
   margin: auto;
   margin-top: 20px;
-  width: 70%;
+  width: 90%;
   height: auto;
   background-color: rgb(231, 158, 158);
   padding: 20px;
@@ -60,7 +52,7 @@ html, body {
 .description_content {
   margin: auto;
   margin-top: 20px;
-  width: 70%;
+  width: 90%;
   height: auto;
   background-color: rgb(201, 241, 211);
   padding: 20px;
@@ -70,7 +62,7 @@ html, body {
 .performance_content {
   margin: auto;
   margin-top: 20px;
-  width: 70%;
+  width: 90%;
   height: auto;
   background-color: rgb(145, 147, 248);
   padding: 20px;
