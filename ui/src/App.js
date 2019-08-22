@@ -81,9 +81,7 @@ class App extends Component {
 
   handlePredictClick = (event) => {
     const formData = this.state.formData;
-    // this.setState({ isLoading: true });
-    var response = "";
-    // var result = ""
+    this.setState({ isLoading: true });
     this.setState({ open: !this.state.open});
     fetch(`http://127.0.0.1:5000/csv_linker/?resource_id=${formData.textfield1}`, 
       {
@@ -94,7 +92,7 @@ class App extends Component {
         method: 'GET'
       })
       .then(response =>  response.json())
-      .then(result => this.setState({ result }))
+      .then(result => this.setState({ result, isLoading: false }))
       .catch(console.log)
     console.log(this.state.result)
     
@@ -121,13 +119,13 @@ class App extends Component {
 
     <Container>
         <div className="title">
-          <h5>CSV Detective API v0.1 (Updated 2019-08-21)</h5>
+          <h5>CSV Detective API<sup><font size="1">BETA</font></sup> (Updated 2019-08-21)</h5>
         </div>
         <div className="input_content">
         <Form>
           <Form.Row>
             <Form.Group as={Col}>
-              <Form.Label>Enter a <a href="https://www.data.gouv.fr">data.gouv.fr</a> resource ID:</Form.Label>
+              <Form.Label>Enter a <a href="https://www.data.gouv.fr">data.gouv.fr</a> CSV resource ID:</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="e.g., 1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa"
@@ -144,7 +142,7 @@ class App extends Component {
                   variant="success"
                   disabled={isLoading}
                   onClick={!isLoading ? this.handlePredictClick : null}>
-                  { isLoading ? 'Making analysis' : 'Analyze' }
+                  { isLoading ? 'Making analysis' : 'Submit' }
               </Button>
             </Form.Group>
           </Form.Row>
