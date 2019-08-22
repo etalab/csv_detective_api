@@ -59,6 +59,17 @@ html, body {
   border-radius: 8px;
 }
 
+.results_content_ml {
+  margin: auto;
+  margin-top: 20px;
+  width: 90%;
+  height: auto;
+  background-color: rgb(231, 158, 158);
+  padding: 20px;
+  border-radius: 8px;
+  border-style: dashed;
+}
+
 .description_content {
   margin: auto;
   margin-top: 20px;

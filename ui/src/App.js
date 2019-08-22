@@ -250,15 +250,53 @@ class App extends Component {
                 <Row>
                   {
                     (() => {
-                      if (result !== "" && Object.keys(result["reference_matched_datasets"]["matched_datasets"]).length !== 0)
-                      {
-                        return(
-                          <Col>
-                          {this.getReferenceDatasets(result)}
-                          </Col>
+                        if(Object.keys(result["reference_matched_datasets"]["matched_datasets"]).length !== 0)
+                        {
+                          return(
+                            <Col>
+                            {this.getReferenceDatasets(result)}
+                            </Col>
 
-                        )
-                      }
+                          )
+                        }
+                        else
+                        {
+                          return(<Col>No reference datasets where found for your dataset ¯\_(ツ)_/¯</Col>)
+                        }
+                    })()
+                  }
+                </Row>
+            </div>
+          )
+        }
+      })()
+      } 
+
+{
+        (() => {
+          if (result !== "")
+        { 
+          return(
+            <div className="results_content_ml">
+                <Row>
+                    <Col><h3>Identified Columns (ML)</h3></Col>
+                </Row>
+                <Row>
+                  {
+                    (() => {
+                        if(Object.keys(result["reference_matched_datasets"]["matched_datasets"]).length !== 0)
+                        {
+                          return(
+                            <Col>
+                            {this.getReferenceDatasets(result)}
+                            </Col>
+
+                          )
+                        }
+                        else
+                        {
+                          return(<Col>No reference datasets where found for your dataset ¯\_(ツ)_/¯</Col>)
+                        }
                     })()
                   }
                 </Row>
