@@ -68,6 +68,6 @@ def get_reference_dataset(column_types):
     return reference_datasets
 
 
-b = {"columns_rb": {"a": "adresse", "b": "code_departement", "s":"siren", "t":"siret"}}
+# b = {"columns_rb": {"a": "adresse", "b": "code_departement", "s":"siren", "t":"siret"}}
 # b = {"columns_rb": {"a": "uai", "b": "nopo", "s":"foo", "t":"bar"}}
-print (link_reference_datasets(b))
+# print (link_reference_datasets(b))

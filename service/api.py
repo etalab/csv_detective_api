@@ -2,7 +2,6 @@
 import os
 
 from flask import Flask
-from flask import make_response
 from flask import request
 from flask import jsonify
 
@@ -10,8 +9,8 @@ from flask_restplus import Api, Resource, fields
 
 import logging
 import json
-
-from dgf_matcher.reference_matcher import link_reference_datasets
+from utils.reference_matcher import link_reference_datasets
+from utils.parsers import file_upload
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
@@ -23,28 +22,20 @@ api = Api(app=app,
           title="DGF Column Linker",
           description="Get the types contained in a DGF CSV file and link them to their respective reference dataset.")
 
-
 ns_csv_linker = api.namespace('csv_linker', description='Link CSVs')
 
 model = api.model('Analysis parameters',
-                  {'textField1': fields.String(required=True,
-                                               description="DGF Resource ID or CSV path",
-                                               help="Text Field 1 cannot be blank")
+                  {'resource_id': fields.String(required=True,
+                                                description="DGF Resource ID or CSV path",
+                                                help="Resource ID cannot be blank")
                    }
                   # 'textField2': fields.String(required=True,
                   #                             description="Text Field 2",
                   #                             help="Text Field 2 cannot be blank"),
-                  # 'select1': fields.Integer(required=True,
-                  #                           description="Select 1",
-                  #                           help="Select 1 cannot be blank"),
-                  # 'select2': fields.Integer(required=True,
-                  #                           description="Select 2",
-                  #                           help="Select 2 cannot be blank"),
-                  # 'select3': fields.Integer(required=True,
-                  #                           description="Select 3",
-                  #                           help="Select 3 cannot be blank")}
+
                   )
 CSV_INFO = {}
+
 
 @ns_csv_linker.route("/")
 class CSVLinker(Resource):
@@ -65,6 +56,14 @@ class CSVLinker(Resource):
             return jsonify({"error": str(e)})
         # return {'hello': 'world'}
 
+    @ns_csv_linker.expect(file_upload)
+    def post(self):
+        args = file_upload.parse_args()
+        if args["resource_csv"].mimetype != "text/csv":
+            return jsonify({"error": "The uploaded file seems to not be a CSV."})
+
+        pass
+
 
 @ns_csv_linker.route("/isAlive")
 class IsAlive(Resource):
@@ -82,7 +81,7 @@ def after_request(response):
 
 def reformat_response(response):
     response = dict(response)
-    new_response = {}   
+    new_response = {}
     if "columns_rb" in response:
         reformatted_rb = {k: v[0] for k, v in response["columns_rb"].items()}
         new_response["columns_rb"] = reformatted_rb

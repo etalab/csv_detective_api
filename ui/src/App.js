@@ -9,6 +9,7 @@ import Collapse from 'react-bootstrap/Collapse';
 import Table from 'react-bootstrap/Table';
 import ReactJson from 'react-json-view';
 import 'bootstrap/dist/css/bootstrap.css';
+import Dropzone from 'react-dropzone'
 
 class App extends Component {
 
@@ -17,20 +18,18 @@ class App extends Component {
 
     this.state = {
       isLoading: false,
-      formData: {
-        textfield1: '1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa',
-        textfield2: '',
-        select1: 1,
-        select2: 1,
-        select3: 1},
+      formData: {resource_id: ''},
       open: false,
-      result: ""
+      result: "",
+      
     };
     this.handleChange = this.handleChange.bind(this);  
     this.handlePredictClick = this.handlePredictClick.bind(this);
   }
 
-  
+  onDrop = (acceptedFiles) => {
+    console.log(acceptedFiles);
+  }
 
   handleChange = (event) => {
     const value = event.target.value;
@@ -42,7 +41,6 @@ class App extends Component {
     });
   }
 
-  // getRreferenceDatesets = (referenceDatasets)
 
   handleCSVResponse = (response, detected_type) =>
   {
@@ -83,7 +81,8 @@ class App extends Component {
     const formData = this.state.formData;
     this.setState({ isLoading: true });
     this.setState({ open: !this.state.open});
-    fetch(`http://127.0.0.1:5000/csv_linker/?resource_id=${formData.textfield1}`, 
+    formData.resource_id = formData.resource_id !== "" ? formData.resource_id : "1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa";
+    fetch(`http://127.0.0.1:5000/csv_linker/?resource_id=${formData.resource_id}`, 
       {
         headers: {
           'Accept': 'application/json',
@@ -129,8 +128,8 @@ class App extends Component {
               <Form.Control
                 type="text"
                 placeholder="e.g., 1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa"
-                name="textfield1"
-                value={formData.textfield1}
+                name="resource_id"
+                value={formData.resource_id}
                 onChange={this.handleChange}
                 />
             </Form.Group>
@@ -146,84 +145,128 @@ class App extends Component {
               </Button>
             </Form.Group>
           </Form.Row>
+          <Form.Row>
+            <Form.Group as={Col}>
+              <Dropzone onDrop={this.onDrop} accept="text/csv" maxSize={5242880}>
+              {({getRootProps, getInputProps, isDragActive, isDragReject, rejectedFiles}) => {
+                const isFileTooLarge = rejectedFiles.length > 0 && rejectedFiles[0].size > 5242880;
+                return(
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  {!isDragActive && (<div>Or click <font color="#0000EE">here</font> or drop a CSV to upload (max 5mb)</div>)}
+                  {isDragActive && !isDragReject && "Drop it like it's hot!"}
+                  {isDragReject && "File type not accepted, sorry!"}
+                  {isFileTooLarge && (
+                    <div className="text-danger mt-2">
+                      File is too large.
+                    </div>
+                  )}
+                </div> 
+                ) 
+                }
+                }
+              </Dropzone>
+            </Form.Group>
+          </Form.Row>
+          <Form.Row>
+          </Form.Row>
         </Form>
         </div>
+        {
+          (() => {
+            if (result !== "" && Object.keys(result["metadata"]).length !== 0)
+            {
+              return(
+              <div className="results_content">
+                  <Row>
+                      <Col><h3>Metadata</h3></Col>
+                  </Row>
+                  <Row>
+                    {
+                      (() => {
+                        if (result !== "" && Object.keys(result["metadata"]).length !== 0)
+                        {
+                          return(
+                            <Col>
+                            <ReactJson src={result["metadata"]} collapsed={1} name={false} displayDataTypes={false} />
+                            </Col>
 
-        <Collapse in={open}>
-        <div className="results_content">
-            <Row>
-                <Col><h3>Metadata</h3></Col>
-            </Row>
-            <Row>
-              {
-                (() => {
-                  if (result !== "" && Object.keys(result["metadata"]).length !== 0)
-                  {
-                    return(
-                      <Col>
-                      <ReactJson src={result["metadata"]} collapsed={1} name={false} displayDataTypes={false} />
-                      </Col>
+                          )
+                        }
+                      })()
+                    }
+                  </Row>
+              </div>
+              )
+            }
+        })()
+      }
 
-                    )
-                  }
-                })()
-              }
-            </Row>
-        </div>
-        </Collapse>
-
-        <Collapse in={open}>
-          <div className="results_content">
-            <Row>
-                <Col><h3>Identified Columns</h3></Col>
-            </Row>
-            <Row>
-              <Col>
-              {
-                result === "" ? null :
-                (
-                  <Table hover size="sm">
-                  <thead>
-                    <tr>
-                      <th>Column Name</th>
-                      <th>Type Detected</th>
-                      {/* <th>Reference Dataset</th> */}
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {this.handleCSVResponse(result, "columns_rb")}
-                  </tbody>
-                </Table>
-                )
-              }
-              </Col>
-            </Row>
-          </div>
-        </Collapse>
+      {
+        (() => {
+          if (result !== "")
+          {
+            return(
+            <div className="results_content">
+              <Row>
+                  <Col><h3>Identified Columns (Rule Based)</h3></Col>
+              </Row>
+              <Row>
+                <Col>
+                {
+                  result === "" ? null :
+                  (
+                    <Table hover size="sm">
+                    <thead>
+                      <tr>
+                        <th>Column Name</th>
+                        <th>Type Detected</th>
+                        {/* <th>Reference Dataset</th> */}
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {this.handleCSVResponse(result, "columns_rb")}
+                    </tbody>
+                  </Table>
+                  )
+                }
+                </Col>
+              </Row>
+            </div>
+            )
+           }
+        })()
+      } 
         
-        <Collapse in={open}>
-        <div className="results_content">
-            <Row>
-                <Col><h3>Reference Datasets</h3></Col>
-            </Row>
-            <Row>
-              {
-                (() => {
-                  if (result !== "" && Object.keys(result["reference_matched_datasets"]["matched_datasets"]).length !== 0)
+      {
+        (() => {
+          if (result !== "")
+        { 
+          return(
+            <div className="results_content">
+                <Row>
+                    <Col><h3>Reference Datasets</h3></Col>
+                </Row>
+                <Row>
                   {
-                    return(
-                      <Col>
-                      {this.getReferenceDatasets(result)}
-                      </Col>
+                    (() => {
+                      if (result !== "" && Object.keys(result["reference_matched_datasets"]["matched_datasets"]).length !== 0)
+                      {
+                        return(
+                          <Col>
+                          {this.getReferenceDatasets(result)}
+                          </Col>
 
-                    )
+                        )
+                      }
+                    })()
                   }
-                })()
-              }
-            </Row>
-        </div>
-        </Collapse>
-        
+                </Row>
+            </div>
+          )
+        }
+      })()
+      } 
         <div className="description_content">
           <Row>
               <Col><h3>About</h3></Col>
