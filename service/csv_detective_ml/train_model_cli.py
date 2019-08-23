@@ -28,7 +28,7 @@ from xgboost import XGBClassifier
 # logger.addHandler(logging.StreamHandler())
 from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
 # from prediction import PredictColumnInfoExtractor
-from utils import header_tokenizer
+from service.csv_detective_ml.utils import header_tokenizer
 
 if __name__ == '__main__':
     parser = argopt(__doc__).parse_args()
@@ -84,23 +84,24 @@ if __name__ == '__main__':
         )),
 
         # Use a SVC classifier on the combined features
-        # ('XG', XGBClassifier(n_jobs=n_cores)),
+        ('XG', XGBClassifier(n_jobs=n_cores)),
         # ("MLP", MLPClassifier((512, ))),
-        ("LR", LogisticRegression(n_jobs=n_cores, solver="liblinear", multi_class="auto", class_weight="balanced")),
+        # ("LR", LogisticRegression(n_jobs=n_cores, solver="liblinear", multi_class="auto", class_weight="balanced")),
 
     ])
 
-    try:
-        test_distant, _ = ColumnInfoExtractor(n_files=10, n_rows=num_rows, train_size=1.0,
+    # try:
+    train, test = ColumnInfoExtractor(n_files=1000, n_rows=300, train_size=.80,
                                             n_jobs=n_cores, column_sample=True).transform(
-             annotations_file="./data/distant_annotation.csv",
+             annotations_file="./csv_detective_ml/data/distant_human_supervised_all.csv",
              csv_folder="/data/datagouv/datagouv_full")
-    except:
-        test_distant = None
+    # except Exception as e:
+    #     print("Error", e)
+    #     test_distant = None
 
-    train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
-                                      n_jobs=n_cores).transform(annotations_file=tagged_file_path,
-                                                                csv_folder=csv_folder_path)
+    # train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
+    #                                   n_jobs=n_cores).transform(annotations_file=tagged_file_path,
+    #                                                             csv_folder=csv_folder_path)
 
     pipeline.fit(train, train["y"])
     if test is not None:
@@ -108,11 +109,11 @@ if __name__ == '__main__':
         y_pred = pipeline.predict(test)
         print(classification_report(y_test, y_pred=y_pred))
 
-    if test_distant is not None:
-        print("\n\nTEST DISTANT\n\n")
-        y_test = test_distant["y"]
-        y_pred = pipeline.predict(test_distant)
-        print(classification_report(y_test, y_pred=y_pred))
+    # if test_distant is not None:
+    #     print("\n\nTEST DISTANT\n\n")
+    #     y_test = test_distant["y"]
+    #     y_pred = pipeline.predict(test_distant)
+    #     print(classification_report(y_test, y_pred=y_pred))
 
     # Save pipeline
     joblib.dump(pipeline, output_model_path + '/model.joblib')

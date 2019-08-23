@@ -167,9 +167,10 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
             # for j in range(len(df.columns)):
             for col in file_columns_d:
                 # Get all values of the column j and clean it a little bit
-                temp_list = df.loc[:, col].dropna().to_list()
+                col_copy = col.strip('"')
+                temp_list = df.loc[:, col_copy].dropna().to_list()
                 file_columns.append(temp_list)
-                columns_names.extend([col] * len(temp_list))
+                columns_names.extend([col_copy] * len(temp_list))
 
             rows_labels = []
             rows_values = []

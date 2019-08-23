@@ -19,7 +19,9 @@ class App extends Component {
     this.state = {
       isLoading: false,
       formData: {resource_id: ''},
-      open: false,
+      openAbout: false,
+      openPerf: false,
+
       result: "",
       
     };
@@ -41,6 +43,16 @@ class App extends Component {
     });
   }
 
+  updateOpenAbout = () =>
+  {
+    this.setState({openAbout: !this.state.openAbout})
+  }
+
+
+  updateOpenPerf = () =>
+  {
+    this.setState({openPerf: !this.state.openPerf})
+  }
 
   handleCSVResponse = (response, detected_type) =>
   {
@@ -80,7 +92,7 @@ class App extends Component {
   handlePredictClick = (event) => {
     const formData = this.state.formData;
     this.setState({ isLoading: true });
-    this.setState({ open: !this.state.open});
+    // this.setState({ open: !this.state.open});
     formData.resource_id = formData.resource_id !== "" ? formData.resource_id : "1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa";
     fetch(`http://127.0.0.1:5000/csv_linker/?resource_id=${formData.resource_id}`, 
       {
@@ -112,7 +124,8 @@ class App extends Component {
     const isLoading = this.state.isLoading;
     const formData = this.state.formData;
     const result = this.state.result;
-    const open = this.state.open;
+    const openAbout = this.state.openAbout;
+    const openPerf = this.state.openPerf;
     
     return (
 
@@ -124,7 +137,7 @@ class App extends Component {
         <Form>
           <Form.Row>
             <Form.Group as={Col}>
-              <Form.Label>Enter a <a href="https://www.data.gouv.fr">data.gouv.fr</a> CSV resource ID:</Form.Label>
+              <Form.Label>Enter a <a href="https://www.data.gouv.fr" target="_blank">data.gouv.fr</a> CSV resource ID:</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="e.g., 1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa"
@@ -153,7 +166,7 @@ class App extends Component {
                 return(
                 <div {...getRootProps()}>
                   <input {...getInputProps()} />
-                  {!isDragActive && (<div>Or click <font color="#0000EE">here</font> or drop a CSV to upload (max 5mb)</div>)}
+                  {!isDragActive && (<div>Or upload a CSV by clicking or dropping it <font color="#0000EE">here</font> (max 5mb)</div>)}
                   {isDragActive && !isDragReject && "Drop it like it's hot!"}
                   {isDragReject && "File type not accepted, sorry!"}
                   {isFileTooLarge && (
@@ -279,7 +292,7 @@ class App extends Component {
           return(
             <div className="results_content_ml">
                 <Row>
-                    <Col><h3>Identified Columns (ML)</h3></Col>
+                    <Col><h3>Identified Columns (Machine Learning Based)</h3></Col>
                 </Row>
                 <Row>
                   {
@@ -305,35 +318,67 @@ class App extends Component {
         }
       })()
       } 
+        
+        
         <div className="description_content">
+        <Row>
+            <Col><h3 onClick={this.updateOpenAbout}>About</h3></Col>
+        </Row>
+        <Collapse in={openAbout}>
+          <div>
           <Row>
-              <Col><h3>About</h3></Col>
-          </Row>
-          <Row>
-            <Col><h6>What?</h6></Col>
-            <Col><h6>Why?</h6></Col>
-            <Col><h6>How?</h6></Col>
-            <Col><h6>Where?</h6></Col>
-          </Row>
-        </div>
-        <div className="performance_content">
-          <Row>
-          <Col>
-            <h3>Performance</h3>
+            <Col><h5>What?</h5>
+            <a href="https://github.com/etalab/csv_detective">CSV Detective</a> is a tool that tells you what is the type of the data within a given CSV: whether there are columns containing a <i>SIRET</i> or a <i>SIREN</i> number, a postal code, a department or a commune name, a geographic position, etc. 
           </Col>
           </Row>
-          <Row>
-            {this.modifi()}
-          </Row>
+            <Row>
+            <Col><h5>Why?</h5>
+            This tool was developed  with <a href="https://www.data.gouv.fr" target="_blank">data.gouv.fr</a> (DGF) in mind. Being a repository of open datasets is one of the main tasks of DGF. In that sense, knowing what is inside the large collection of CSVs it contains can be useful for several tasks:
+            <ul>
+              <li><b>Enrich</b> the results of the <b>search engine</b> with the contents of the CSVs.</li>
+              <li><b>Link datasets together</b> according to their values.</li>
+              <li><b>Link datasets</b> with well-maintained, trustable <b>reference datasets</b>.</li>
+              <li><b>Group datasets together</b> according to their general topic.</li>
+            </ul>
+            </Col>
+            </Row> 
+            <Row>
+            <Col><h5>How?</h5>
+            CSV Detective has two strategies to detect a column type:
+            <ol>
+              <li><b>Rules + References</b>: using regular expressions and also comparing the values with reference data (e.g., if the value <i>69007</i> appears in a list of postal codes, then it is a postal code.</li>
+              <li><b>Supervised Learning (In progress)</b>: manually tagging columnt types and then determining simple features coupled to the content of the cells themselves to train classification algorithms.</li>
+            </ol>
+            </Col>
+            </Row>
+            <Row><Col><h5>Where?</h5>
+            The code lives <a href="https://github.com/psorianom/csv_detective_api" target="_blank">here</a>.
+            
+            </Col></Row>
+            </div>
+          </Collapse>
         </div>
-        {
-          //   (<Row>
-          //     <Col className="result-container">
-          //       <h5 id="result">{result}</h5>
-          //     </Col>
-            // </Row>)
-        }
-
+        
+        <div className="performance_content">
+          <Row>
+            <Col><h3 onClick={this.updateOpenPerf}>Performance</h3></Col>
+          </Row>
+          <Collapse in={openPerf}>
+          <div>
+            <Row>
+              <Col>
+                <p>Rule Based</p>
+                <img src="https://img.shields.io/badge/F--score-65.7-green"></img>
+              </Col>
+              <Col>
+                <p>Machine Learning Based</p>
+                <img src="https://img.shields.io/badge/F--score-76.7-green"></img>
+              </Col>
+            </Row>
+          </div>
+          </Collapse>
+          
+        </div>
     </Container>
     );
   }
