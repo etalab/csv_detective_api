@@ -28,7 +28,7 @@ from xgboost import XGBClassifier
 # logger.addHandler(logging.StreamHandler())
 from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
 # from prediction import PredictColumnInfoExtractor
-from service.csv_detective_ml.utils import header_tokenizer
+# from service.csv_detective_ml.utils import header_tokenizer
 
 if __name__ == '__main__':
     parser = argopt(__doc__).parse_args()
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     ])
 
     # try:
-    train, test = ColumnInfoExtractor(n_files=1000, n_rows=300, train_size=.80,
+    train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
                                             n_jobs=n_cores, column_sample=True).transform(
              annotations_file="./csv_detective_ml/data/top150_plus_sample_annotation.csv",
              csv_folder="/data/datagouv/datagouv_full")
