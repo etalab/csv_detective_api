@@ -25,7 +25,7 @@ import logging
 
 
 from prediction import get_columns_ML_prediction, get_columns_types
-from utils.files_io import extract_id, get_files
+from service.utils.files_io import extract_id, get_files
 ML_PIPELINE = None
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -90,7 +90,6 @@ if __name__ == '__main__':
     logger.info("Saving info to JSON")
     logger.debug(dict(csv_info))
     json.dump(dict(csv_info), open("./csv_data_test.json", "w"))
-    pass
 
 
 
