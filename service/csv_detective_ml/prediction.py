@@ -101,11 +101,9 @@ def get_columns_ML_prediction(csv_path, pipeline, num_rows=500):
 def get_columns_types(y_pred, csv_info):
     def get_most_frequent(list_predictions):
         u, counts = np.unique(list_predictions, return_counts=True)
-        print(u, counts)
+        # print(u, counts)
         return u[0]
 
-    from collections import OrderedDict
-    num_columns = [len(f) for f in csv_info["per_file_rows"]][0]
     assert (len(y_pred) == len(csv_info["all_headers"]))
     dict_columns = defaultdict(list)
     head_pred = list(zip(csv_info["all_headers"], y_pred))

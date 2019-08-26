@@ -7,7 +7,7 @@ Usage:
 
 Arguments:
     <i>                                An input directory with csvs(if dir it will convert all txt files inside).
-    --analysis_type ANAL_TYPE          The type of column type analysis: rule, mlearning, both [default: "both":str]
+    --analysis_type ANALYSIS_TYPE          The type of column type analysis: rule, mlearning, both [default: "both":str]
     --num_files NFILES                 Number of files (CSVs) to work with [default: 10:int]
     --num_rows NROWS                   Number of rows per file to use [default: 500:int]
     --num_cores=<n> CORES                  Number of cores to use [default: 1:int]
@@ -17,25 +17,27 @@ import json
 import joblib
 from argopt import argopt
 from csv_detective.explore_csv import routine
-from joblib import Parallel, delayed, load
+from joblib import Parallel, delayed
 from tqdm import tqdm
+import os
 
 import logging
+
+
+from prediction import get_columns_ML_prediction, get_columns_types
+from utils.files_io import extract_id, get_files
+ML_PIPELINE = None
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 
-from prediction import get_columns_ML_prediction, get_columns_types
-from utils import extract_id, get_files
-ML_PIPELINE = None
-
 
 def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500):
-    dict_result = {}
     logger.info(" csv_detective on {}".format(file_path))
 
     try:
         if analysis_type == "both" or analysis_type == "rule":
+            logger.info(f"Starting vanilla CSV Detective on file {file_path}")
             dict_result = routine(file_path, num_rows=num_rows)
 
             if "columns" in dict_result:
@@ -44,6 +46,7 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500):
                 dict_result.pop("columns")
         else:
             # Get ML tagging
+            logger.info(f"Starting ML CSV Detective on file {file_path}")
             dict_result = routine(file_path, num_rows=num_rows, user_input_tests=None)
 
         if analysis_type != "rule":
@@ -53,7 +56,7 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500):
 
     except Exception as e:
             logger.info("Analyzing file {0} failed with {1}".format(file_path, e))
-            return extract_id(file_path), {"status": "{}".format(e)}
+            return extract_id(file_path), {"error": "{}".format(e)}
 
     return extract_id(file_path), dict_result
 
@@ -65,12 +68,16 @@ if __name__ == '__main__':
     num_files = parser.num_files
     num_rows = parser.num_rows
     n_jobs = int(parser.num_cores)
+
+
     if analysis_type != "rule":
         logger.info("Loading ML model...")
         ML_PIPELINE = joblib.load('csv_detective_ml/models/model.joblib')
 
-    # list_files = ["03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv"]
-    list_files = get_files(csv_folder_path, sample=None)
+    if os.path.isfile(csv_folder_path):
+        list_files = [csv_folder_path]
+    else:
+        list_files = get_files(csv_folder_path, sample=None)
 
     if n_jobs and n_jobs > 1:
         csv_info = Parallel(n_jobs=n_jobs)(
@@ -81,7 +88,8 @@ if __name__ == '__main__':
                     for f in tqdm(list_files)]
 
     logger.info("Saving info to JSON")
-    json.dump(dict(csv_info), open("./csv_data_lamadre.json", "w"))
+    logger.debug(dict(csv_info))
+    json.dump(dict(csv_info), open("./csv_data_test.json", "w"))
     pass
 
 
