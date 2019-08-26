@@ -166,6 +166,11 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
             columns_names = []
             # for j in range(len(df.columns)):
             for col in file_columns_d:
+                if col not in df.columns:
+                    # TODO: This is a parsing error. This happens because the annotation files were
+                    # TODO: parsed differently to the files read here.
+                    continue
+
                 # Get all values of the column j and clean it a little bit
                 col_copy = col.strip('"')
                 temp_list = df.loc[:, col_copy].dropna().to_list()
@@ -174,7 +179,8 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
 
             rows_labels = []
             rows_values = []
-
+            if not file_columns or not columns_names:
+                continue
             # Get both lists of labels and values-per-column in a single flat huge list
             for i, l in enumerate(file_labels):
                 rows_labels.extend([l] * len(file_columns[i]))
@@ -202,7 +208,8 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
             csv_info = [self._extract_columns(f)
                         for f in list_files]
 
-        dataset_items = defaultdict(lambda: defaultdict(list))
+        dataset_items = defaultdict(lambda: defaultdict(list)) # dict of dict of lists
+
         for datasets in csv_info:
             if not datasets:
                 continue
