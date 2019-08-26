@@ -1,9 +1,6 @@
-import glob
-
-import numpy as np
-import matplotlib.pylab as plt
 import pandas as pd
 import seaborn as sns
+from matplotlib import pylab as plt
 
 
 def visualize_matrices(list_matrices, names):
@@ -15,7 +12,6 @@ def visualize_matrices(list_matrices, names):
     plt.show()
 
 
-# noinspection PyProtectedMember
 def visualize_multivariate(X, y):
     assert X.shape[0] == len(y)
     df = pd.DataFrame._from_arrays(X.toarray().T, columns=range(X.shape[1]), index=range(X.shape[0]))
@@ -27,19 +23,3 @@ def visualize_multivariate(X, y):
     plt.show()
 
 
-def get_files(data_path, ext="csv", sample=None):
-    files = glob.glob(data_path + "/*.{}".format(ext))
-    if sample:
-        return list(np.random.choice(files, sample, replace=False))
-    return files
-
-
-def extract_id(file_path):
-    import os
-    resource_id = os.path.basename(file_path)[:-4]
-    return resource_id
-
-
-def header_tokenizer(x):
-    import re
-    return re.split(r"[\s_]]+", x)
