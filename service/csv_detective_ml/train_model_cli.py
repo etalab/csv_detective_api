@@ -93,8 +93,8 @@ if __name__ == '__main__':
     # try:
     train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
                                             n_jobs=n_cores, column_sample=True).transform(
-             annotations_file="./csv_detective_ml/data/top150_plus_sample_annotation.csv",
-             csv_folder="/data/datagouv/datagouv_full")
+             annotations_file=tagged_file_path,
+             csv_folder=csv_folder_path)
     # except Exception as e:
     #     print("Error", e)
     #     test_distant = None
