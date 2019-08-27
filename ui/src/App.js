@@ -369,11 +369,11 @@ class App extends Component {
             <Row>
               <Col>
                 <p>Rule Based</p>
-                <img src="https://img.shields.io/badge/F--score-65.7-green"></img>
+                <img src="https://img.shields.io/badge/F--score-84.1-green"></img>
               </Col>
               <Col>
                 <p>Machine Learning Based</p>
-                <img src="https://img.shields.io/badge/F--score-76.7-green"></img>
+                <img src="https://img.shields.io/badge/F--score-87.7-green"></img>
               </Col>
             </Row>
           </div>
