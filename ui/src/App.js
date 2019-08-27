@@ -141,7 +141,7 @@ class App extends Component {
         <Form>
           <Form.Row>
             <Form.Group as={Col}>
-              <Form.Label>Enter a <a href="https://www.data.gouv.fr" target="_blank">data.gouv.fr</a> CSV resource ID:</Form.Label>
+              <Form.Label>Enter a <a href="https://www.data.gouv.fr" target="_blank" rel="noopener noreferrer">data.gouv.fr</a> CSV resource ID:</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="e.g., 1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa"
@@ -343,7 +343,7 @@ class App extends Component {
           </Row>
             <Row>
             <Col><h5>Why?</h5>
-            This tool was developed  with <a href="https://www.data.gouv.fr" target="_blank">data.gouv.fr</a> (DGF) in mind. Being a repository of open datasets is one of the main tasks of DGF. In that sense, knowing what is inside the large collection of CSVs it contains can be useful for several tasks:
+            This tool was developed  with <a href="https://www.data.gouv.fr" target="_blank" rel="noopener noreferrer">data.gouv.fr</a> (DGF) in mind. Being a repository of open datasets is one of the main tasks of DGF. In that sense, knowing what is inside the large collection of CSVs it contains can be useful for several tasks:
             <ul>
               <li><b>Enrich</b> the results of the <b>search engine</b> with the contents of the CSVs.</li>
               <li><b>Link datasets together</b> according to their values.</li>
@@ -362,7 +362,7 @@ class App extends Component {
             </Col>
             </Row>
             <Row><Col><h5>Where?</h5>
-            The code lives <a href="https://github.com/psorianom/csv_detective_api" target="_blank">here</a>.
+            The code lives <a href="https://github.com/psorianom/csv_detective_api" target="_blank" rel="noopener noreferrer">here</a>.
             
             </Col></Row>
             </div>
@@ -378,11 +378,11 @@ class App extends Component {
             <Row>
               <Col>
                 <p>Rule Based</p>
-                <img src="https://img.shields.io/badge/F--score-84.1-green"></img>
+                <img src="https://img.shields.io/badge/F--score-84.1-green" alt="F1-score=84.1"></img>
               </Col>
               <Col>
                 <p>Machine Learning Based</p>
-                <img src="https://img.shields.io/badge/F--score-87.7-green"></img>
+                <img src="https://img.shields.io/badge/F--score-87.1-green" alt="F1-score=87.1"></img>
               </Col>
             </Row>
           </div>

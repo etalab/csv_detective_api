@@ -2,7 +2,7 @@ version: '3'
 services:
   service:
     build: ./service
-    export:
+    expose:
       - 5000
     ports:
       - "5000:5000"
