@@ -26,7 +26,7 @@ from xgboost import XGBClassifier
 # logger = logging.getLogger()
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler())
-from csv_detective_ml.features import ItemSelector, CustomFeatures, ColumnInfoExtractor
+from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
 # from prediction import PredictColumnInfoExtractor
 # from service.csv_detective_ml.utils import header_tokenizer
 
