@@ -337,8 +337,8 @@ class App extends Component {
             <Col><h5>What?</h5>
 
             <a href="https://github.com/etalab/csv_detective">CSV Detective</a> is a tool that gives you information about a CSV, such as its encoding and separator, as well as the type of columns contained inside: whether there are columns containing a <i>SIRET</i> or a <i>SIREN</i> number, a postal code, a department or a commune name, a geographic position, etc. 
-            This UI builds on CSV Detective. We improved it, APIfied it, and throught this interface, allow a friendlier use. Also a machine learning model to detect types was added (which is work in progress).
-
+            <p>This UI builds on CSV Detective. We improved it, APIfied it, and through this interface, allow a friendlier use. Also a machine learning model to detect types was added (which is work in progress).
+            </p>
           </Col>
           </Row>
             <Row>
