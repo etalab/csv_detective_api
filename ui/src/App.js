@@ -30,7 +30,20 @@ class App extends Component {
   }
 
   onDrop = (acceptedFiles) => {
-    console.log(acceptedFiles);
+    let formData = new FormData();
+    formData.append('resource_csv', acceptedFiles[0])
+    this.state.formData.resource_id = acceptedFiles[0].name
+    // formData.resource_csv = acceptedFiles[0];
+    this.setState({ isLoading: true });
+    fetch(`http://127.0.0.1:5000/csv_detective/`, 
+      {
+        method: 'POST',
+        body: formData
+      })
+      .then(response =>  response.json())
+      .then(result => this.setState({ result, isLoading: false }))
+      .catch(console.log)
+    // console.log(acceptedFiles);
   }
 
   handleChange = (event) => {
@@ -94,7 +107,7 @@ class App extends Component {
     this.setState({ isLoading: true });
     // this.setState({ open: !this.state.open});
     formData.resource_id = formData.resource_id !== "" ? formData.resource_id : "1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa";
-    fetch(`http://127.0.0.1:5000/csv_linker/?resource_id=${formData.resource_id}`, 
+    fetch(`http://127.0.0.1:5000/csv_detective/?resource_id=${formData.resource_id}`, 
       {
         headers: {
           'Accept': 'application/json',
@@ -106,19 +119,8 @@ class App extends Component {
       .then(result => this.setState({ result, isLoading: false }))
       .catch(console.log)
     console.log(this.state.result)
-    
-    
   }
   
-  modifi() {
-    // const greeting = 'Hello Function Component!';
-    // this.setState({ result: "foook" });
-
-    return (
-      <h5> OMG</h5>
-    );
-  }
-
   render() {
     
     const isLoading = this.state.isLoading;
@@ -217,7 +219,7 @@ class App extends Component {
 
       {
         (() => {
-          if (result !== "")
+          if (result !== "") 
           {
             return(
             <div className="results_content">
@@ -234,7 +236,6 @@ class App extends Component {
                       <tr>
                         <th>Column Name</th>
                         <th>Type Detected</th>
-                        {/* <th>Reference Dataset</th> */}
                       </tr>
                     </thead>
                     <tbody>
@@ -250,7 +251,43 @@ class App extends Component {
            }
         })()
       } 
-        
+
+      {   
+        (() => {
+          if (result !== "" && Object.keys(result["columns_ml"]).length !== 0)
+          {
+            return(
+            <div className="results_content">
+              <Row>
+                  <Col><h3>Identified Columns (ML Based)</h3></Col>
+              </Row>
+              <Row>
+                <Col>
+                {
+                  result === "" ? null :
+                  (
+                    <Table hover size="sm">
+                    <thead>
+                      <tr>
+                        <th>Column Name</th>
+                        <th>Type Detected</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {this.handleCSVResponse(result, "columns_ml")}
+                    </tbody>
+                  </Table>
+                  )
+                }
+                </Col>
+              </Row>
+            </div>
+            )
+           }
+        })()
+      } 
+
+
       {
         (() => {
           if (result !== "")
@@ -285,39 +322,7 @@ class App extends Component {
       })()
       } 
 
-{
-        (() => {
-          if (result !== "")
-        { 
-          return(
-            <div className="results_content_ml">
-                <Row>
-                    <Col><h3>Identified Columns (Machine Learning Based)</h3></Col>
-                </Row>
-                <Row>
-                  {
-                    (() => {
-                        if(Object.keys(result["reference_matched_datasets"]["matched_datasets"]).length !== 0)
-                        {
-                          return(
-                            <Col>
-                            {this.getReferenceDatasets(result)}
-                            </Col>
-
-                          )
-                        }
-                        else
-                        {
-                          return(<Col>No reference datasets where found for your dataset ¯\_(ツ)_/¯</Col>)
-                        }
-                    })()
-                  }
-                </Row>
-            </div>
-          )
-        }
-      })()
-      } 
+       
         
         
         <div className="description_content">
@@ -328,8 +333,10 @@ class App extends Component {
           <div>
           <Row>
             <Col><h5>What?</h5>
-            <a href="https://github.com/etalab/csv_detective">CSV Detective</a> is a tool that gives you information about a CSV, such as its encoding and separator, as well as the type of columns contained within. That is, whether there are columns containing a <i>SIRET</i> or a <i>SIREN</i> number, a postal code, a department or a commune name, a geographic position, etc. 
-            <p>This interface builds on CSV Detective. It improves it, APIfies it and allows for direct utilisation of the module.</p> 
+
+            <a href="https://github.com/etalab/csv_detective">CSV Detective</a> is a tool that gives you information about a CSV, such as its encoding and separator, as well as the type of columns contained inside: whether there are columns containing a <i>SIRET</i> or a <i>SIREN</i> number, a postal code, a department or a commune name, a geographic position, etc. 
+            This UI builds on CSV Detective. We improved it, APIfied it, and throught this interface, allow a friendlier use. Also a machine learning model to detect types was added (which is work in progress).
+
           </Col>
           </Row>
             <Row>
@@ -362,7 +369,7 @@ class App extends Component {
         
         <div className="performance_content">
           <Row>
-            <Col><h3 onClick={this.updateOpenPerf}>Performance</h3></Col>
+            <Col><h3 onClick={this.updateOpenPerf}>Current Performance</h3></Col>
           </Row>
           <Collapse in={openPerf}>
           <div>

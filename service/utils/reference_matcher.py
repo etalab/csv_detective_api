@@ -47,9 +47,17 @@ def link_reference_datasets(response, analysis_type="columns_rb"):
     :param analysis_type:
     :return:
     """
-    if analysis_type in response:
-        column_types = list(response[analysis_type].values())
-        reference_datasets = get_reference_dataset(column_types)
+    columns_types_rb = []
+    columns_types_ml = []
+    if "columns_rb" in response and response["columns_rb"]:
+        columns_types_rb = list(response["columns_rb"].values())  # column_types = ["uai", "boleeen", "commune", ...]
+    if "columns_ml" in response and response["columns_ml"]:
+        columns_types_ml = list(response["columns_ml"].values())
+
+    columns_types = list(set(columns_types_rb + columns_types_ml))
+
+    if columns_types:
+        reference_datasets = get_reference_dataset(columns_types)
         response["reference_matched_datasets"] = {}
         response["reference_matched_datasets"]["matched_datasets"] = reference_datasets
         response["reference_matched_datasets"]["reference_datasets"] = REFERENCES_DICT

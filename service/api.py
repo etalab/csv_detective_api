@@ -90,11 +90,14 @@ class CSVDetectiveAPI(Resource):
         try:
             tmp.write(uploaded_csv.read())
             tmp.close()
-            csv_info = analyze_csv(tmp.name, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=500)
-            print(csv_info)
+            _, response = analyze_csv(tmp.name, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=500)
+
         finally:
             os.remove(tmp.name)
 
+        response = reformat_response(response)
+        response = link_reference_datasets(response)
+        return jsonify(response)
 
 @ns_csv_detective.route("/isAlive")
 class IsAlive(Resource):
