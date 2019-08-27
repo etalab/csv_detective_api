@@ -20,7 +20,6 @@ from csv_detective.explore_csv import routine
 from joblib import Parallel, delayed
 from tqdm import tqdm
 import os, sys
-print(sys.path)
 import logging
 
 

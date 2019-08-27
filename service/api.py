@@ -1,6 +1,7 @@
 #!flask/bin/python
 import os
-
+import sys
+sys.path.append("./csv_detective_ml")  # horrible hack to load my features class to load my ML pipeline :/
 from flask import Flask
 from flask import request
 from flask import jsonify
@@ -9,7 +10,8 @@ from tempfile import NamedTemporaryFile
 
 import logging
 import json
-import csv_detective_ml.features as features  # needed to load ML PIPELINE
+
+import features  # needed to load ML PIPELINE
 from joblib import load
 from utils.reference_matcher import link_reference_datasets
 from utils.parsers import file_upload
@@ -24,11 +26,10 @@ logger.addHandler(logging.StreamHandler())
 app = Flask(__name__)
 api = Api(app=app,
           version="0.1",
-          title="DGF Column Linker",
-          description="Get the types contained in a DGF CSV file and link them to their respective reference dataset.")
+          title="CSV Detective API",
+          description="Get info about the data contained in a DGF CSV file.")
 
-ns_csv_linker = api.namespace('csv_linker', description='Link CSVs')
-
+ns_csv_detective = api.namespace('csv_detective', description='Get data from DGF CSVs')
 
 
 model = api.model('Analysis parameters',
@@ -52,8 +53,8 @@ def load_ml_model():
 
 load_ml_model()
 
-@ns_csv_linker.route("/")
-class CSVLinker(Resource):
+@ns_csv_detective.route("/")
+class CSVDetectiveAPI(Resource):
     @api.expect(model)
     def get(self):
         global CSV_INFO
@@ -71,7 +72,7 @@ class CSVLinker(Resource):
             return jsonify({"error": str(e)})
         # return {'hello': 'world'}
 
-    @ns_csv_linker.expect(file_upload)
+    @ns_csv_detective.expect(file_upload)
     def post(self):
 
         args = file_upload.parse_args()
@@ -95,7 +96,7 @@ class CSVLinker(Resource):
             os.remove(tmp.name)
 
 
-@ns_csv_linker.route("/isAlive")
+@ns_csv_detective.route("/isAlive")
 class IsAlive(Resource):
     def get(self):
         return "True"
