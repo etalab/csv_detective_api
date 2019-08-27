@@ -16,13 +16,10 @@ RUN  wget https://codeload.github.com/psorianom/csv_detective/zip/parse_table_mo
 
 RUN  unzip parse_table_modified
 
-RUN  cd csv_detective-parse_table_modified
-
-
 EXPOSE 5000
 
 ENTRYPOINT ["/opt/conda/envs/csv/bin/python"]
 
-RUN pip install -e /app/csv_detective-parse_table_modified
+ENV PYTHONPATH ./csv_detective-parse_table_modified
 
 CMD ["api.py"]
