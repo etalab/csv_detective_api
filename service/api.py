@@ -132,7 +132,7 @@ def reformat_response(response):
 if __name__ == '__main__':
     # load csv_detective info json
     try:
-        with open("csv_data.json", "r") as filo:
+        with open("./data/csv_data.json", "r") as filo:
             logger.info("Loading JSON file with csv info...")
             CSV_INFO = json.load(filo)
 

@@ -12,7 +12,9 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Dropzone from 'react-dropzone'
 
 class App extends Component {
-
+  componentDidMount() {
+    document.title = 'CSV Detective API';
+  }
   constructor(props) {
     super(props);
 
