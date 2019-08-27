@@ -4,7 +4,6 @@ from collections import defaultdict
 from sklearn.base import BaseEstimator, TransformerMixin
 from csv_detective.detection import detect_encoding, detect_separator, detect_headers, parse_table
 import numpy as np
-import features
 
 
 class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):

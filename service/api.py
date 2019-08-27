@@ -4,13 +4,18 @@ import os
 from flask import Flask
 from flask import request
 from flask import jsonify
-
 from flask_restplus import Api, Resource, fields
+from tempfile import NamedTemporaryFile
 
 import logging
 import json
+import csv_detective_ml.features as features  # needed to load ML PIPELINE
+from joblib import load
 from utils.reference_matcher import link_reference_datasets
 from utils.parsers import file_upload
+
+
+from csv_detective_ml.analyze_csv_cli import analyze_csv
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
@@ -24,6 +29,8 @@ api = Api(app=app,
 
 ns_csv_linker = api.namespace('csv_linker', description='Link CSVs')
 
+
+
 model = api.model('Analysis parameters',
                   {'resource_id': fields.String(required=True,
                                                 description="DGF Resource ID or CSV path",
@@ -35,7 +42,15 @@ model = api.model('Analysis parameters',
 
                   )
 CSV_INFO = {}
+ML_PIPELINE = None
 
+def load_ml_model():
+    global ML_PIPELINE
+    logger.info("Loading ML model...")
+    ML_PIPELINE = load('./csv_detective_ml/models/model.joblib')
+    return ML_PIPELINE
+
+load_ml_model()
 
 @ns_csv_linker.route("/")
 class CSVLinker(Resource):
@@ -58,11 +73,26 @@ class CSVLinker(Resource):
 
     @ns_csv_linker.expect(file_upload)
     def post(self):
-        args = file_upload.parse_args()
-        if args["resource_csv"].mimetype != "text/csv":
-            return jsonify({"error": "The uploaded file seems to not be a CSV."})
 
-        pass
+        args = file_upload.parse_args()
+        if "resource_csv" in args and args["resource_csv"].mimetype != "text/csv":
+            return jsonify({"error": "No uploaded file or the file seems to not be a CSV."})
+
+        if ML_PIPELINE is None:
+            analysis_type = "rule"
+        else:
+            analysis_type = "both"
+        uploaded_csv = args["resource_csv"]
+
+        tmp = NamedTemporaryFile(delete=False)
+
+        try:
+            tmp.write(uploaded_csv.read())
+            tmp.close()
+            csv_info = analyze_csv(tmp.name, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=500)
+            print(csv_info)
+        finally:
+            os.remove(tmp.name)
 
 
 @ns_csv_linker.route("/isAlive")

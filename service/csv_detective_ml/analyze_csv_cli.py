@@ -24,10 +24,8 @@ print(sys.path)
 import logging
 
 
-
-
-from prediction import get_columns_ML_prediction, get_columns_types
-from utils.files_io import extract_id, get_files
+from csv_detective_ml.prediction import get_columns_ML_prediction, get_columns_types
+from csv_detective_ml.utils.files_io import extract_id, get_files
 ML_PIPELINE = None
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -70,7 +68,6 @@ if __name__ == '__main__':
     num_files = parser.num_files
     num_rows = parser.num_rows
     n_jobs = int(parser.num_cores)
-
 
     if analysis_type != "rule":
         logger.info("Loading ML model...")
