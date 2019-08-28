@@ -14,7 +14,7 @@ This tool was developed with data.gouv.fr (DGF) in mind. Being a repository of o
 *    Link datasets with well-maintained, trustable reference datasets.
 *    Group datasets together according to their general topic.
 
-# How?
+## How?
 CSV Detective has two strategies to detect a column type:
                
 1.   _Rules + References_: using regular expressions and also comparing the values with reference data (e.g., if the value 69007 appears in a list of postal codes, then it is a postal code.
@@ -25,7 +25,7 @@ CSV Detective has two strategies to detect a column type:
 The easiest way to install this API is by cloning it and creating a Docker container. To do this you first need docker and docker-compose installed.
 After cloning, move into the project's folder and run `docker-compose up`.
 
-## Using the API 
+# Using the API 
 
 The API is described in `localhost:5000` via the API swagger interface.
 
