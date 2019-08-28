@@ -18,7 +18,7 @@ This tool was developed with data.gouv.fr (DGF) in mind. Being a repository of o
 CSV Detective has two strategies to detect a column type:
 
 1.   _Rules + References_: using regular expressions and also comparing the values with reference data (e.g., if the value 69007 appears in a list of postal codes, then it is a postal code.
-2.   _Supervised Learning (In progress)_: manually tagging columnt types and then determining simple features coupled to the content of the cells themselves to train classification algorithms.
+2.   _Supervised Learning (In progress)_: manually tagging column types and then determining simple features coupled to the content of the cells themselves to train classification algorithms.
 
 # Requirements
 
