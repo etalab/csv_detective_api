@@ -15,7 +15,7 @@ services:
   ui:
     build: ./ui
     environment:
-      - ENV REACT_APP_API_URL="http://localhost:5000/csv_detective/"
+      - REACT_APP_API_URL="http://localhost:5000/csv_detective/"
     expose:
       - 3000
     ports:
