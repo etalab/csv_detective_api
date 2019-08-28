@@ -1,4 +1,4 @@
-# CSV Detective API and FrontEnd
+# CSV Detective API and Frontend
 
 
 ## What?
