@@ -23,15 +23,12 @@ class App extends Component {
       formData: {resource_id: ''},
       openAbout: false,
       openPerf: false,
-      API_URL : process.env.REACT_APP_API_URL,
+
       result: "",
       
     };
     this.handleChange = this.handleChange.bind(this);  
     this.handlePredictClick = this.handlePredictClick.bind(this);
-    if(this.state.API_URL == null)
-      this.state.API_URL = "http://localhost:5000/csv_detective/";
-
   }
 
   onDrop = (acceptedFiles) => {
@@ -40,7 +37,7 @@ class App extends Component {
     this.state.formData.resource_id = acceptedFiles[0].name
     // formData.resource_csv = acceptedFiles[0];
     this.setState({ isLoading: true });
-    fetch(this.state.API_URL, 
+    fetch(`http://localhost:5000/csv_detective/`, 
       {
         method: 'POST',
         body: formData
@@ -112,8 +109,7 @@ class App extends Component {
     this.setState({ isLoading: true });
     // this.setState({ open: !this.state.open});
     formData.resource_id = formData.resource_id !== "" ? formData.resource_id : "1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa";
-    let url = this.state.API_URL + `?resource_id=${formData.resource_id}`;
-    fetch(url, 
+    fetch(`http://localhost:5000/csv_detective/?resource_id=${formData.resource_id}`, 
       {
         headers: {
           'Accept': 'application/json',
