@@ -37,7 +37,7 @@ class App extends Component {
     this.state.formData.resource_id = acceptedFiles[0].name
     // formData.resource_csv = acceptedFiles[0];
     this.setState({ isLoading: true });
-    fetch(`http://127.0.0.1:5000/csv_detective/`, 
+    fetch(`http://localhost:5000/csv_detective/`, 
       {
         method: 'POST',
         body: formData
@@ -109,7 +109,7 @@ class App extends Component {
     this.setState({ isLoading: true });
     // this.setState({ open: !this.state.open});
     formData.resource_id = formData.resource_id !== "" ? formData.resource_id : "1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa";
-    fetch(`http://127.0.0.1:5000/csv_detective/?resource_id=${formData.resource_id}`, 
+    fetch(`http://localhost:5000/csv_detective/?resource_id=${formData.resource_id}`, 
       {
         headers: {
           'Accept': 'application/json',
@@ -354,7 +354,7 @@ class App extends Component {
             </Row> 
             <Row>
             <Col><h5>How?</h5>
-            The UI has two modes of functioning: you can enter a DGF resource ID and click the button below or you can load a CSV file by clicking in the corresponding area. The process in both cases will start automatically.
+            The UI has two modes of functioning: you can enter a DGF resource ID and click the button below   or you can load a CSV file by clicking in the corresponding area. The process in both cases will start automatically.
             Behind the scenes, CSV Detective has two strategies to detect a column type:
             <ol>
               <li><b>Rules + References</b>: using regular expressions and also comparing the values with reference data (e.g., if the value <i>69007</i> appears in a list of postal codes, then it is a postal code.</li>
