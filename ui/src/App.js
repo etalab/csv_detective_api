@@ -343,9 +343,9 @@ class App extends Component {
           </Row>
             <Row>
             <Col><h5>Why?</h5>
-            This tool was developed  with <a href="https://www.data.gouv.fr" target="_blank" rel="noopener noreferrer">data.gouv.fr</a> (DGF) in mind. One of the main tasks of DGF is being a repository of open datasets. These datasets are often contined within CSV files. Knowing what is inside this large collection of CSVs can be useful for several tasks:
+            This tool was developed  with <a href="https://www.data.gouv.fr" target="_blank" rel="noopener noreferrer">data.gouv.fr</a> (DGF) in mind. One of the main tasks of DGF is being a repository of open datasets. These datasets are often contained within CSV files. Knowing what is inside this large collection of CSVs can be useful for several tasks:
             <ul>
-              <li><b>Enrich</b> the results of the <b>search engine</b> with the contents of the CSVs.</li>
+              <li><b>Enrich</b> the results of DGF <b>search engine</b> with the contents of the CSVs.</li>
               <li><b>Link datasets together</b> according to their values.</li>
               <li><b>Link datasets</b> with well-maintained, trustable <b>reference datasets</b>.</li>
               <li><b>Group datasets together</b> according to their general topic.</li>
@@ -354,7 +354,7 @@ class App extends Component {
             </Row> 
             <Row>
             <Col><h5>How?</h5>
-            The UI has two modes of functioning: you can enter a DGF resource ID and clicking the button or you can load a CSV file by clicking in the corresponding area. The process in both cases will start automatically.
+            The UI has two modes of functioning: you can enter a DGF resource ID and click the button below or you can load a CSV file by clicking in the corresponding area. The process in both cases will start automatically.
             Behind the scenes, CSV Detective has two strategies to detect a column type:
             <ol>
               <li><b>Rules + References</b>: using regular expressions and also comparing the values with reference data (e.g., if the value <i>69007</i> appears in a list of postal codes, then it is a postal code.</li>
