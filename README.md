@@ -23,12 +23,9 @@ CSV Detective has two strategies to detect a column type:
 # Requirements
 
 The easiest way to install this API is by cloning it and creating a Docker container. To do this you first need docker and docker-compose installed.
+After cloning, move into the project's folder and run `docker-compose up`.
 
+## Using the API 
 
-## Run on docker - local 
-1. After cloning, move into the project's folder and run `docker-compose up`.
-
-## Use sample api  
-
-The API is described in `localhost:5000` via a swagger interface.
+The API is described in `localhost:5000` via the API swagger interface.
 
