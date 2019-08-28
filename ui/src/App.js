@@ -27,8 +27,14 @@ class App extends Component {
       result: "",
       
     };
+    this.url = process.env.REACT_APP_URL
     this.handleChange = this.handleChange.bind(this);  
     this.handlePredictClick = this.handlePredictClick.bind(this);
+    if (this.url == null)
+    {
+      console.log("no url from env")
+      this.url = 'http://localhost:5000/csv_detective/';
+    }
   }
 
   onDrop = (acceptedFiles) => {
@@ -109,7 +115,8 @@ class App extends Component {
     this.setState({ isLoading: true });
     // this.setState({ open: !this.state.open});
     formData.resource_id = formData.resource_id !== "" ? formData.resource_id : "1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa";
-    fetch(`http://localhost:5000/csv_detective/?resource_id=${formData.resource_id}`, 
+    fetch(this.url + `?resource_id=${formData.resource_id}`,
+    // fetch(`http://localhost:5000/csv_detective/?resource_id=${formData.resource_id}`, 
       {
         headers: {
           'Accept': 'application/json',
