@@ -52,6 +52,7 @@ dependencies:
     - argopt==0.5.0
     - cchardet==2.1.4
     - chardet==3.0.4
+    - flask-cors==3.0.8
     - tqdm==4.35.0
     - unidecode==1.1.1
     - xgboost==0.90

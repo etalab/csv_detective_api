@@ -79,3 +79,17 @@ def get_reference_dataset(column_types):
 # b = {"columns_rb": {"a": "adresse", "b": "code_departement", "s":"siren", "t":"siret"}}
 # b = {"columns_rb": {"a": "uai", "b": "nopo", "s":"foo", "t":"bar"}}
 # print (link_reference_datasets(b))
+def reformat_response(response):
+    response = dict(response)
+    new_response = {}
+    if "columns_rb" in response:
+        reformatted_rb = {k: v[0] for k, v in response["columns_rb"].items()}
+        new_response["columns_rb"] = reformatted_rb
+        response.pop("columns_rb")
+    if "columns_ml" in response:
+        reformatted_ml = {k: v[0] for k, v in response["columns_ml"].items()}
+        new_response["columns_ml"] = reformatted_ml
+        response.pop("columns_ml")
+
+    new_response["metadata"] = dict(response)
+    return new_response
