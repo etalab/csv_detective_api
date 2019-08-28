@@ -27,7 +27,7 @@ class App extends Component {
       result: "",
       
     };
-    let tempo = process.env.REACT_APP_URL
+    let tempo = process.env.REACT_APP_API_URL
     this.url = "";
     if(tempo == null)
       {
@@ -46,7 +46,8 @@ class App extends Component {
     this.state.formData.resource_id = acceptedFiles[0].name
     // formData.resource_csv = acceptedFiles[0];
     this.setState({ isLoading: true });
-    fetch(`http://localhost:5000/csv_detective/`, 
+    let urlo = this.url;
+    fetch(urlo, 
       {
         method: 'POST',
         body: formData
@@ -118,7 +119,7 @@ class App extends Component {
     this.setState({ isLoading: true });
     // this.setState({ open: !this.state.open});
     formData.resource_id = formData.resource_id !== "" ? formData.resource_id : "1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa";
-    let urlo = this.url + `?resource_id=${formData.resource_id}`
+    let urlo = this.url + `?resource_id=${formData.resource_id}`;
     console.log(urlo)
     // fetch(`http://localhost:5000/csv_detective/?resource_id=${formData.resource_id}`, 
     fetch(urlo, 
