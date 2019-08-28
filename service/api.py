@@ -6,6 +6,7 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask_restplus import Api, Resource, fields
+from flask_cors import CORS
 from tempfile import NamedTemporaryFile
 
 import logging
@@ -24,6 +25,7 @@ logger.setLevel(logging.ERROR)
 logger.addHandler(logging.StreamHandler())
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app=app,
           version="0.1",
           title="CSV Detective API",
@@ -108,8 +110,9 @@ class IsAlive(Resource):
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', "Content-Type")
-    response.headers.add('Access-Control-Allow-Methods', "*")
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
 
