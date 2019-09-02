@@ -50,14 +50,13 @@ if __name__ == '__main__':
         ('union', FeatureUnion(
             transformer_list=[
 
-                # Pipeline for pulling custom features from the columns
+                # Pipeline for custom hand-crafted features for cell values
                 ('custom_features', Pipeline([
                     ('selector', ItemSelector(key='per_file_rows')),
-                    ('customfeatures', CustomFeatures(n_jobs=n_cores)),
                     ("customvect", DictVectorizer())
                 ])),
                 #
-                # Pipeline for standard bag-of-words models for cell values
+                # Pipeline for standard bag-of-words features for cell values
                 ('cell_features', Pipeline([
                     ('selector', ItemSelector(key='all_columns')),
                     ('count', TfidfVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
