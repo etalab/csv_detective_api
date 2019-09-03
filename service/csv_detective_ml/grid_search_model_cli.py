@@ -13,6 +13,8 @@ Arguments:
     --train_size TRAIN                 Percentage for training . If 1.0, then no testing is done [default: 0.7:float]
 '''
 # import logging
+from itertools import product
+
 import joblib
 from argopt import argopt
 from sklearn import clone
@@ -93,32 +95,32 @@ if __name__ == '__main__':
     ])
 
     # try:
-    train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
-                                            n_jobs=n_cores, column_sample=True).transform(
-             annotations_file=tagged_file_path,
-             csv_folder=csv_folder_path)
+    # train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
+    #                                         n_jobs=n_cores, column_sample=True).transform(
+    #          annotations_file=tagged_file_path,
+    #          csv_folder=csv_folder_path)
 
     # pipeline.fit(train, train["y"])
     grid_search = {
-        "num_rows": [10,20,50, 75, 100, 150, 200, 250, 300, 400, 500, 700, 800, 1000],
-        "num_files": [100, 300, 500, 700, 1000, 1500, 2000, 2500]
+        "n_rows": [10,20,50, 75, 100, 150, 200, 250, 300, 400, 500, 700, 800, 1000],
+        "n_files": [100, 300, 500, 700, 1000, 1500, 2000, 2500]
 
     }
     results_dict = []
     models_dict = []
-    for param, values in grid_search[:2]:
-        for test_val in values[:2]:
-            print(f"Testing with {param}: {test_val}")
-            train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
-                                            n_jobs=n_cores, column_sample=True).transform(
-             annotations_file=tagged_file_path,
-             csv_folder=csv_folder_path)
-            pipeline.fit(train, train["y"])
-            y_test = test["y"]
-            y_pred = pipeline.predict(test)
-            run_f1 = f1_score(y_true=y_test, y_pred=y_pred, average="macro")
-            results_dict[f"{str(param)}_{str(test_val)}"]
-            results_dict[f"{str(param)}_{str(test_val)}"] = clone(pipeline)
+
+    for n_row, n_file in list(product(*grid_search.values()))[:2]:
+        print(f"Testing with n_rows={n_row} and  n_files={n_file}")
+        train, test = ColumnInfoExtractor(n_files=n_file, n_rows=n_row, train_size=train_size,
+                                        n_jobs=n_cores, column_sample=True).transform(
+         annotations_file=tagged_file_path,
+         csv_folder=csv_folder_path)
+        pipeline.fit(train, train["y"])
+        y_test = test["y"]
+        y_pred = pipeline.predict(test)
+        run_f1 = f1_score(y_true=y_test, y_pred=y_pred, average="macro")
+        results_dict[f"{str(n_row)}_{str(n_file)}"] = run_f1
+        models_dict[f"{str(n_row)}_{str(n_file)}"] = clone(pipeline)
 
     # if test is not None:
     #     y_test = test["y"]
@@ -131,8 +133,17 @@ if __name__ == '__main__':
     #     y_pred = pipeline.predict(test_distant)
     #     print(classification_report(y_test, y_pred=y_pred))
 
+    import json
+    json.dump(results_dict, open("results.dict.json", "w"))
+
+    sorted_grid = sorted(results_dict.items(), key=lambda x:x[1], reverse=True)
+    best_config = sorted_grid[0][0]
+
+
     # Save pipeline
-    joblib.dump(pipeline, output_model_path + '/model.joblib')
+
+
+    joblib.dump(models_dict[best_config], output_model_path + '/best_GS_model.joblib')
 
     # from prediction import PredictColumnInfoExtractor
     #
