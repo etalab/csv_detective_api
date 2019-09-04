@@ -11,7 +11,11 @@
     "react-json-view": "^1.19.1",
     "react-native": "^0.60.5",
     "react-scripts": "3.1.0",
+<<<<<<< HEAD
     "react-select": "^3.0.4",
+=======
+    "serve": "^11.1.0",
+>>>>>>> f046170b9a438239e6fd90deae1e9ad1c57ceb05
     "yarn": "^1.17.3"
   },
   "scripts": {

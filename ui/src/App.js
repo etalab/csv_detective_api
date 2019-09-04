@@ -24,6 +24,7 @@ class App extends Component {
       openAbout: false,
       resource_chosen:'',
       openPerf: false,
+
       result: "",
       
     };
