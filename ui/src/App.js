@@ -20,10 +20,10 @@ class App extends Component {
 
     this.state = {
       isLoading: false,
-      formData: {resource_id: ''},
+      formData: {resource_id: '', resource_id_list:''},
       openAbout: false,
+      resource_chosen:'',
       openPerf: false,
-
       result: "",
       
     };
@@ -67,6 +67,24 @@ class App extends Component {
       formData
     });
   }
+
+  handleChangeList = (event) => {
+    const value = event.target.value;
+    const name = event.target.name;
+    var formData = this.state.formData;
+    formData[name] = value;
+    this.setState({
+      formData
+    });
+  }
+
+  extractResourceID = (stringo) => {
+    let splitted = stringo.split("(");
+    let id = splitted[1];
+    id = id.substring(0, id.length-1);
+    return id;
+  } 
+  split
 
   updateOpenAbout = () =>
   {
@@ -117,9 +135,19 @@ class App extends Component {
   handlePredictClick = (event) => {
     const formData = this.state.formData;
     this.setState({ isLoading: true });
-    // this.setState({ open: !this.state.open});
-    formData.resource_id = formData.resource_id !== "" ? formData.resource_id : "1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa";
-    let urlo = this.url + `?resource_id=${formData.resource_id}`;
+    let resource_id = "";
+    if (formData.resource_id_list !== "" && formData.resource_id_list !== "Choose...")
+      {
+        resource_id = formData.resource_id_list
+        resource_id = this.extractResourceID(resource_id);
+      }
+    else
+    {
+      formData.resource_id = formData.resource_id !== "" ? formData.resource_id : "1f0ebe13-e1f3-4adb-833a-dfc1ce8020fa";
+      resource_id = formData.resource_id;
+    }
+    this.setState({resource_chosen:resource_id})
+    let urlo = this.url + `?resource_id=${resource_id}`;
     console.log(urlo)
     // fetch(`http://localhost:5000/csv_detective/?resource_id=${formData.resource_id}`, 
     fetch(urlo, 
@@ -146,9 +174,13 @@ class App extends Component {
     
     return (
 
+
+
     <Container>
+
+
         <div className="title">
-          <h5>CSV Detective API<sup><font size="1">BETA</font></sup> (Updated 2019-08-21)</h5>
+          <h5>CSV Detective API<sup><font size="1">BETA</font></sup> (Updated 2019-09-04)</h5>
         </div>
         <div className="input_content">
         <Form>
@@ -162,6 +194,21 @@ class App extends Component {
                 value={formData.resource_id}
                 onChange={this.handleChange}
                 />
+              <div>
+                Or choose one from the examples below:
+              </div>
+              <Form.Control as="select" onChange={this.handleChange} name="resource_id_list">
+                <option>Choose...</option>
+                <option>Base des permis de construire [Sitadel]   (b326730e-8af7-46ee-a412-00413d7ab7c0)</option>
+                <option>Correspondances-code-insee-code-postal   (6d3428b2-3893-45a1-b404-2522a4e77d41)</option>
+                <option>Données des permis de construire pour les logements   (2ddc97c8-c265-4dfe-a6c4-51f214f54871)</option>
+                <option>Open Food Facts   (164c9e57-32a7-4f5b-8891-26af10f91072)</option>
+                <option>Trafic moyen journalier annuel sur le réseau routier national   (72b6729e-c675-41ea-bd41-ea0a0daf5642)</option>
+              </Form.Control>
+
+
+
+
             </Form.Group>
           </Form.Row>
           <Form.Row>
@@ -183,7 +230,7 @@ class App extends Component {
                 return(
                 <div {...getRootProps()}>
                   <input {...getInputProps()} />
-                  {!isDragActive && (<div>Or upload a CSV by clicking or dropping it <font color="#0000EE">here</font> (max 5mb)</div>)}
+                  {!isDragActive && (<div>Or upload a CSV by clicking or dropping it (and then WAITING some time) <font color="#0000EE">here</font> (max 5mb)</div>)}
                   {isDragActive && !isDragReject && "Drop it like it's hot!"}
                   {isDragReject && "File type not accepted, sorry!"}
                   {isFileTooLarge && (
@@ -207,6 +254,30 @@ class App extends Component {
             if (result !== "" && Object.keys(result["metadata"]).length !== 0)
             {
               return(
+              
+              <div className="input_content">
+              <Row>
+                <Col><h3>Resource {this.state.resource_chosen}</h3></Col>
+               </Row>
+              </div>
+              )
+            }
+        })()
+      }
+
+
+
+
+
+
+        {
+          (() => {
+            if (result !== "" && Object.keys(result["metadata"]).length !== 0)
+            {
+              return(
+              // <div>
+              //   <h2>{this.resource_chosen}</h2>
+              // </div>
               <div className="results_content">
                   <Row>
                       <Col><h3>Metadata</h3></Col>
@@ -272,9 +343,9 @@ class App extends Component {
           if (result !== "" && Object.keys(result["columns_ml"]).length !== 0)
           {
             return(
-            <div className="results_content">
+            <div className="results_content_ml">
               <Row>
-                  <Col><h3>Identified Columns (ML Based)</h3></Col>
+                  <Col><h3>Identified Columns (Machine Learning Based)</h3></Col>
               </Row>
               <Row>
                 <Col>
@@ -371,7 +442,7 @@ class App extends Component {
             Behind the scenes, CSV Detective has two strategies to detect a column type:
             <ol>
               <li><b>Rules + References</b>: using regular expressions and also comparing the values with reference data (e.g., if the value <i>69007</i> appears in a list of postal codes, then it is a postal code.</li>
-              <li><b>Supervised Learning (In progress)</b>: manually tagging columnt types and then determining simple features coupled to the content of the cells themselves to train classification algorithms.</li>
+              <li><b>Marchine Learning (In progress)</b>: manually tagging columnt types and then determining simple features coupled to the content of the cells themselves to train classification algorithms.</li>
             </ol>
             </Col>
             </Row>

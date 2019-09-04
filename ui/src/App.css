@@ -47,6 +47,8 @@ html, body {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
+  color:black;
+  
 }
 
 .results_content {
@@ -57,6 +59,8 @@ html, body {
   background-color: rgb(231, 158, 158);
   padding: 20px;
   border-radius: 8px;
+  color:black;
+
 }
 
 .results_content_ml {
@@ -68,6 +72,8 @@ html, body {
   padding: 20px;
   border-radius: 8px;
   border-style: dashed;
+  color:black;
+
 }
 
 .description_content {
@@ -78,6 +84,8 @@ html, body {
   background-color: rgb(201, 241, 211);
   padding: 20px;
   border-radius: 8px;
+  color:black;
+
 }
 
 .performance_content {
@@ -88,6 +96,8 @@ html, body {
   background-color: rgb(145, 147, 248);
   padding: 20px;
   border-radius: 8px;
+  color:black;
+
 }
 
 .App-link {
