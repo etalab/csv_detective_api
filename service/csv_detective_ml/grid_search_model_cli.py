@@ -106,8 +106,8 @@ if __name__ == '__main__':
         "n_files": [100, 300, 500, 700, 1000, 1500, 2000, 2500]
 
     }
-    results_dict = []
-    models_dict = []
+    results_dict = {}
+    models_dict = {}
 
     for n_row, n_file in list(product(*grid_search.values()))[:2]:
         print(f"Testing with n_rows={n_row} and  n_files={n_file}")
