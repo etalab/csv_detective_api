@@ -98,7 +98,7 @@ For the reasons explained above, I decided to diversify my dataset. Lucky me, I 
 
 To increase my annotated column-type dataset, I ran csv_detective for each of these files and then sampled 100 columns of each type detected. Then, I manually annotated the data by checking the results, looking at the content sample, and fixing the errors made by csv_detective. The output is a file just as the shown above (table with 5 columns). This time we have 2812 lines representing the sampled columns (100 per type, when possible). The column types found this time are 32. They are shown below:
 
-| csv_detected     | code_commune_insee | tel_fr             |
+|                  | code_commune_insee | tel_fr             |
 |------------------|--------------------|--------------------|
 | adresse          | sexe               | email              |
 | year             | url                | twitter            |
