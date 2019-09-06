@@ -7,7 +7,7 @@ Arguments:
     <i>                                An input file or directory (if dir it will convert all txt files inside).
     <p>                                Path where to find the resource's CSVs
     <m>                                Path where to save the trained pipeline [default: "models/"]
-    --test_file TESTF                  Path of test dataset [default: None]
+    --test_file TESTF                  Path of test dataset
     --num_files NFILES                 Number of files (CSVs) to work with [default: 10:int]
     --num_rows NROWS                   Number of rows per file to use [default: 200:int]
     --cores=<n> CORES                  Number of cores to use [default: 2:int]
