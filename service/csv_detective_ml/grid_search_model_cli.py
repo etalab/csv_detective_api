@@ -119,8 +119,8 @@ if __name__ == '__main__':
             y_pred = pipeline.predict(test)
 
         run_f1 = f1_score(y_true=y_test, y_pred=y_pred, average="macro")
-        results_dict[f"{str(n_row)}_{str(n_file)}"] = run_f1
-        models_dict[f"{str(n_row)}_{str(n_file)}"] = clone(pipeline)
+        results_dict[f"n_rows:{str(n_row)}_n_files:{str(n_file)}"] = run_f1
+        models_dict[f"n_rows:{str(n_row)}_n_files:{str(n_file)}"] = clone(pipeline)
 
     json.dump(results_dict, open("results.dict.json", "w"))
 
