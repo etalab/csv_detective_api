@@ -101,7 +101,7 @@ if __name__ == '__main__':
             annotations_file=test_file_path,
             csv_folder=csv_folder_path)
 
-    for n_row, n_file in list(product(*grid_search.values()))[:1]:
+    for n_row, n_file in list(product(*grid_search.values()))[:]:
         print(f"Testing with n_rows={n_row} and  n_files={n_file}")
         train, test = ColumnInfoExtractor(n_files=n_file, n_rows=n_row, train_size=train_size,
                                           n_jobs=n_cores, column_sample=True).transform(
