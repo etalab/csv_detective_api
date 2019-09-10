@@ -117,10 +117,3 @@ if __name__ == '__main__':
     # Save pipeline
     joblib.dump(pipeline, output_model_path + '/model.joblib')
 
-    # from prediction import PredictColumnInfoExtractor
-    #
-    # ext = PredictColumnInfoExtractor()
-    # foo = ext.transform("../03c24270-75ac-4a06-9648-44b6b5a5e0f7.csv")
-    # y_pred = pipeline.predict(foo)
-    # print(y_pred)
-    # pass
