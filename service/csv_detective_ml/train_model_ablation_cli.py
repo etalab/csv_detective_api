@@ -13,10 +13,13 @@ Arguments:
     --train_size TRAIN                 Percentage for training . If 1.0, then no testing is done [default: 0.7:float]
 '''
 import json
+from collections import defaultdict
+
+import numpy as np
 from argopt import argopt
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer, HashingVectorizer
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, confusion_matrix
 from sklearn.pipeline import Pipeline, FeatureUnion
 from tqdm import tqdm
 from xgboost import XGBClassifier
@@ -80,13 +83,14 @@ if __name__ == '__main__':
         csv_folder=csv_folder_path)
 
     tqdm.write("Loading data done...")
-    ablation_results = {}
+    ablation_results = defaultdict(dict)
     for pp_name, pp in tqdm(all_pipelines.items()):
         tqdm.write(f"Fitting pipeline {pp_name}")
         pp.fit(train, train["y"])
         y_test = test["y"]
         y_pred = pp.predict(test)
         f_score = f1_score(y_true=y_test, y_pred=y_pred, average='macro')
-        ablation_results[pp_name] = f_score
-
-    json.dump(ablation_results, "./data/ablation_results.json")
+        ablation_results[pp_name]["f_score"] = f_score
+        ablation_results[pp_name]["confusion_matrix"] = confusion_matrix(y_true=y_test, y_pred=y_pred)
+    ablation_results["tags"] = np.unique(test["y"])
+    json.dump(ablation_results, open("./data/ablation_results.json", "w"))
