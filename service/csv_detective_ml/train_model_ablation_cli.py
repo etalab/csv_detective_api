@@ -36,6 +36,52 @@ if __name__ == '__main__':
     train_size = parser.train_size
     n_cores = int(parser.cores)
 
+    pipeline = Pipeline([
+        # Extract column info information from csv
+
+        # Use FeatureUnion to combine the features from subject and body
+        ('union', FeatureUnion(
+            transformer_list=[
+
+                # Pipeline for custom hand-crafted features for cell values
+                ('custom_features', Pipeline([
+                    ('selector', ItemSelector(key='per_file_rows')),
+                    ("customvect", DictVectorizer())
+                ])),
+                #
+                # Pipeline for standard bag-of-words features for cell values
+                ('cell_features', Pipeline([
+                    ('selector', ItemSelector(key='all_columns')),
+                    ('count', TfidfVectorizer(ngram_range=(1, 3), analyzer="char_wb", binary=False, max_features=2000)),
+                ])),
+
+                # Pipeline for standard bag-of-words models for header values
+                ('header_features', Pipeline([
+                    ('selector', ItemSelector(key='all_headers')),
+                    # ('count', TfidfVectorizer(ngram_range=(4, 4), analyzer="char_wb",
+                    #                           binary=False, max_features=2000)),
+                    ('hash', HashingVectorizer(n_features=2 ** 2, ngram_range=(3, 3), analyzer="char_wb")),
+
+                ])),
+
+            ],
+
+            # weight components in FeatureUnion
+            transformer_weights={
+                'custom_features': 1.6,
+                'cell_features': 1,
+                'header_features': .3,
+            },
+
+        )),
+
+        # Use a SVC classifier on the combined features
+        ('XG', XGBClassifier(n_jobs=n_cores)),
+        # ("MLP", MLPClassifier((512, ))),
+        # ("LR", LogisticRegression(n_jobs=n_cores, solver="liblinear", multi_class="auto", class_weight="balanced")),
+
+    ])
+
     features_dict = {0: ('custom_features', Pipeline([
         ('selector', ItemSelector(key='per_file_rows')),
         ("customvect", DictVectorizer())])),
@@ -50,14 +96,14 @@ if __name__ == '__main__':
                                                                                            analyzer="char_wb"))]))}
     all_pipelines = {
 
-        # "custom_features": Pipeline([('union', FeatureUnion(transformer_list=[features_dict[0]])),
-        #                              ('XG', XGBClassifier(n_jobs=n_cores))]),
-        #
-        # "cell_features": Pipeline([('union', FeatureUnion(transformer_list=[features_dict[1]])),
-        #                            ('XG', XGBClassifier(n_jobs=n_cores))]),
-        #
-        # "header_features": Pipeline([('union', FeatureUnion(transformer_list=[features_dict[2]])),
-        #                              ('XG', XGBClassifier(n_jobs=n_cores))]),
+        "custom_features": Pipeline([('union', FeatureUnion(transformer_list=[features_dict[0]])),
+                                     ('XG', XGBClassifier(n_jobs=n_cores))]),
+
+        "cell_features": Pipeline([('union', FeatureUnion(transformer_list=[features_dict[1]])),
+                                   ('XG', XGBClassifier(n_jobs=n_cores))]),
+
+        "header_features": Pipeline([('union', FeatureUnion(transformer_list=[features_dict[2]])),
+                                     ('XG', XGBClassifier(n_jobs=n_cores))]),
 
         "custom_cell": Pipeline([('union', FeatureUnion(transformer_list=[features_dict[0], features_dict[1]])),
                                  ('XG', XGBClassifier(n_jobs=n_cores))]),
@@ -78,6 +124,7 @@ if __name__ == '__main__':
         annotations_file=tagged_file_path,
         csv_folder=csv_folder_path)
 
+    tqdm.write("Loading data done...")
     ablation_results = {}
     for pp_name, pp in tqdm(all_pipelines.items()):
         tqdm.write(f"Fitting pipeline {pp_name}")

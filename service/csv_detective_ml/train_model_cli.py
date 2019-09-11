@@ -53,6 +53,7 @@ if __name__ == '__main__':
                 # Pipeline for custom hand-crafted features for cell values
                 ('custom_features', Pipeline([
                     ('selector', ItemSelector(key='per_file_rows')),
+                    ('customfeatures', CustomFeatures(n_jobs=n_cores)),
                     ("customvect", DictVectorizer())
                 ])),
                 #
@@ -102,6 +103,7 @@ if __name__ == '__main__':
     #                                   n_jobs=n_cores).transform(annotations_file=tagged_file_path,
     #                                                             csv_folder=csv_folder_path)
 
+    print("Data loaded")
     pipeline.fit(train, train["y"])
     if test is not None:
         y_test = test["y"]
