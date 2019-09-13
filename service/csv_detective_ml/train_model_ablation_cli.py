@@ -4,7 +4,8 @@ Usage:
     train_model.py <i> <p> <m> [options]
 
 Arguments:
-    <i>                                An input file or directory (if dir it will convert all txt files inside).
+    <train>                            An input file with the training set data
+    <test>                             An input file with the testing set data
     <p>                                Path where to find the resource's CSVs
     <m>                                Path where to save the trained pipeline [default: "models/"]
     --num_files NFILES                 Number of files (CSVs) to work with [default: 10:int]
@@ -31,7 +32,8 @@ from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
 
 if __name__ == '__main__':
     parser = argopt(__doc__).parse_args()
-    tagged_file_path = parser.i
+    train_file_path = parser.train
+    test_file_path = parser.test
     csv_folder_path = parser.p
     output_model_path = parser.m
     num_files = parser.num_files
@@ -77,9 +79,14 @@ if __name__ == '__main__':
                                         ('XG', XGBClassifier(n_jobs=n_cores))])
     }
 
-    train, test = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=train_size,
+    train, _ = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=1.,
                                       n_jobs=n_cores, column_sample=True).transform(
-        annotations_file=tagged_file_path,
+        annotations_file=train_file_path,
+        csv_folder=csv_folder_path)
+
+    test, _ = ColumnInfoExtractor(n_files=num_files, n_rows=num_rows, train_size=1.,
+                                      n_jobs=n_cores, column_sample=True).transform(
+        annotations_file=test_file_path,
         csv_folder=csv_folder_path)
 
     tqdm.write("Loading data done...")
