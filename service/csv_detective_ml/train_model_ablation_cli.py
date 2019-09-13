@@ -1,7 +1,7 @@
-'''Loads an annotated file and extracts features and tagged types for each resource id
+'''Trains and tests a model with different set of features to determine their importance
 
 Usage:
-    train_model.py <i> <p> <m> [options]
+    train_model.py <train> <test> <p> <m> [options]
 
 Arguments:
     <train>                            An input file with the training set data
