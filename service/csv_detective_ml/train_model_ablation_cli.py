@@ -11,7 +11,6 @@ Arguments:
     --num_files NFILES                 Number of files (CSVs) to work with [default: 10:int]
     --num_rows NROWS                   Number of rows per file to use [default: 200:int]
     --cores=<n> CORES                  Number of cores to use [default: 2:int]
-    --train_size TRAIN                 Percentage for training . If 1.0, then no testing is done [default: 0.7:float]
 '''
 import json
 from collections import defaultdict
