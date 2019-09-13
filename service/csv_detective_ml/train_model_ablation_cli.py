@@ -37,7 +37,6 @@ if __name__ == '__main__':
     output_model_path = parser.m
     num_files = parser.num_files
     num_rows = parser.num_rows
-    train_size = parser.train_size
     n_cores = int(parser.cores)
 
     features_dict = {0: ('custom_features', Pipeline([
