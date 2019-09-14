@@ -96,6 +96,6 @@ if __name__ == '__main__':
         y_pred = pp.predict(test)
         f_score = f1_score(y_true=y_test, y_pred=y_pred, average='macro')
         ablation_results[pp_name]["f_score"] = f_score
-        ablation_results[pp_name]["confusion_matrix"] = str(confusion_matrix(y_true=y_test, y_pred=y_pred))
+        ablation_results[pp_name]["confusion_matrix"] = confusion_matrix(y_true=y_test, y_pred=y_pred).to_list()
     ablation_results["tags"] = list(np.unique(test["y"]))
     json.dump(ablation_results, open("./data/ablation_results.json", "w"))
