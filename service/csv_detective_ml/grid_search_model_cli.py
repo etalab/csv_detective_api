@@ -44,11 +44,11 @@ if __name__ == '__main__':
             transformer_list=[
 
                 # Pipeline for pulling custom features from the columns
-                ('custom_features', Pipeline([
-                    ('selector', ItemSelector(key='per_file_rows')),
-                    ('customfeatures', CustomFeatures(n_jobs=n_cores)),
-                    ("customvect", DictVectorizer())
-                ])),
+                # ('custom_features', Pipeline([
+                #     ('selector', ItemSelector(key='per_file_rows')),
+                #     ('customfeatures', CustomFeatures(n_jobs=n_cores)),
+                #     ("customvect", DictVectorizer())
+                # ])),
                 #
                 # Pipeline for standard bag-of-words models for cell values
                 ('cell_features', Pipeline([
