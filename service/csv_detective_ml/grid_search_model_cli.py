@@ -20,6 +20,7 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer, HashingVectorizer
 from sklearn.metrics import f1_score
 from sklearn.pipeline import Pipeline, FeatureUnion
+from tqdm import tqdm
 from xgboost import XGBClassifier
 import json
 
@@ -82,7 +83,7 @@ if __name__ == '__main__':
     ])
 
     grid_search = {
-        "n_rows": [20, 50, 75, 100, 200,  300,  500, 700, 1000],
+        "n_rows": [20, 50, 75, 100, 200, 300, 500, 700, 1000],
         "n_files": [100, 300, 500, 700, 1000, 1500, 3000]
 
     }
@@ -90,20 +91,20 @@ if __name__ == '__main__':
     models_dict = {}
 
     test_global, _ = ColumnInfoExtractor(n_files=None, n_rows=500, train_size=1.0,
-                                  n_jobs=n_cores, column_sample=True).transform(
+                                         n_jobs=n_cores, column_sample=True).transform(
         annotations_file=test_file_path,
         csv_folder=csv_folder_path)
 
-    for n_row, n_file in list(product(*grid_search.values()))[:1]:
-        print(f"Using n_rows={n_row} and  n_files={n_file}")
+    for n_row, n_file in tqdm(product(*grid_search.values())):
+        tqdm.write(f"Using n_rows={n_row} and  n_files={n_file}")
         train, _ = ColumnInfoExtractor(n_files=n_file, n_rows=n_row, train_size=1,
-                                          n_jobs=n_cores, column_sample=True).transform(
+                                       n_jobs=n_cores, column_sample=True).transform(
             annotations_file=train_file_path,
             csv_folder=csv_folder_path)
-        print("\nFitting...")
+        tqdm.write("\nFitting...")
         pipeline.fit(train, train["y"])
 
-        print("\nTesting...")
+        tqdm.write("\nTesting...")
         y_test = test_global["y"]
         y_pred = pipeline.predict(test_global)
 
