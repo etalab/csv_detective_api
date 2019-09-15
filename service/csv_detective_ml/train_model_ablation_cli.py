@@ -8,7 +8,7 @@ Arguments:
     <test>                             An input file with the testing set data
     <p>                                Path where to find the resource's CSVs
     <m>                                Path where to save the trained pipeline [default: "models/"]
-    --num_files NFILES                 Number of files (CSVs) to work with [default: 10:int]
+    --num_files NFILES                 Number of files (CSVs) to work with
     --num_rows NROWS                   Number of rows per file to use [default: 200:int]
     --cores=<n> CORES                  Number of cores to use [default: 2:int]
 '''
