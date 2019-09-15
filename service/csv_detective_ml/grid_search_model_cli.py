@@ -112,7 +112,7 @@ if __name__ == '__main__':
         results_dict[f"n_rows:{str(n_row)}_n_files:{str(n_file)}"] = run_f1
         models_dict[f"n_rows:{str(n_row)}_n_files:{str(n_file)}"] = clone(pipeline)
 
-    json.dump(results_dict, open("results_dict.json", "w"))
+    json.dump(results_dict, open("./data/results_grid_search.json", "w"))
 
     sorted_grid = sorted(results_dict.items(), key=lambda x: x[1], reverse=True)
     best_config = sorted_grid[0][0]
