@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     grid_search = {
         "n_rows": [20, 50, 75, 100, 200, 300, 500, 700, 1000],
-        "n_files": [100, 300, 500, 700, 1000, 1500, 3000]
+        "n_files": [100, 300, 500, 700, 1000, 1500, None]
 
     }
     results_dict = {}
@@ -97,10 +97,13 @@ if __name__ == '__main__':
 
     for n_row, n_file in tqdm(product(*grid_search.values())):
         tqdm.write(f"Using n_rows={n_row} and  n_files={n_file}")
-        train, _ = ColumnInfoExtractor(n_files=n_file, n_rows=n_row, train_size=1,
-                                       n_jobs=n_cores, column_sample=True).transform(
-            annotations_file=train_file_path,
-            csv_folder=csv_folder_path)
+        cie = ColumnInfoExtractor(n_files=n_file, n_rows=n_row, train_size=1,
+                                       n_jobs=n_cores, column_sample=True)
+        train, _ = cie.transform(annotations_file=train_file_path,
+                                 csv_folder=csv_folder_path)
+
+        if not n_file:
+            n_file = cie.n_files
         tqdm.write("\nFitting...")
         pipeline.fit(train, train["y"])
 

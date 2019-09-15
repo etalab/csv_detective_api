@@ -121,6 +121,8 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
         if self.n_files:
             csv_ids = csv_ids[:self.n_files]
             df_annotation = df_annotation[df_annotation.id.isin(csv_ids)]
+        else:
+            self.n_files = len(csv_ids)
 
         df_annotation.human_detected = df_annotation.human_detected.fillna("O")
 
