@@ -51,11 +51,11 @@ if __name__ == '__main__':
             transformer_list=[
 
                 # Pipeline for custom hand-crafted features for cell values
-                ('custom_features', Pipeline([
-                    ('selector', ItemSelector(key='per_file_rows')),
-                    ('customfeatures', CustomFeatures(n_jobs=n_cores)),
-                    ("customvect", DictVectorizer())
-                ])),
+                #('custom_features', Pipeline([
+                #    ('selector', ItemSelector(key='per_file_rows')),
+                #    ('customfeatures', CustomFeatures(n_jobs=n_cores)),
+                #    ("customvect", DictVectorizer())
+                #])),
                 #
                 # Pipeline for standard bag-of-words features for cell values
                 ('cell_features', Pipeline([
