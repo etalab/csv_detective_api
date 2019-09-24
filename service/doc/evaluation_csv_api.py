@@ -108,8 +108,6 @@ def get_results_list(method="ml"):
 # In[48]:
 
 
-ml_results[:10]
-
 
 # In[31]:
 

@@ -1,16 +1,13 @@
-# import os
 from collections import defaultdict
 
-from sklearn.base import BaseEstimator, TransformerMixin
-from csv_detective.detection import detect_encoding, detect_separator, detect_headers, parse_table
 import numpy as np
+from csv_detective.detection import detect_encoding, detect_separator, detect_headers, parse_table
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
-class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
-    """Extract the subject & body from a usenet post in a single pass.
-
-    Takes a sequence of strings and produces a dict of sequences.  Keys are
-    `subject` and `body`.
+class PredictCSVColumnInfoExtractor(BaseEstimator, TransformerMixin):
+    """Extract the columns from a csv into the required structures in order to use
+    the trained csv_detective ML pipeline
     """
 
     def __init__(self, n_rows=200, n_jobs=1, save_dataset=False):
@@ -86,8 +83,12 @@ class PredictColumnInfoExtractor(BaseEstimator, TransformerMixin):
         return columns_info
 
 
+def get_column_prediction(column_series, pipeline):
+    pass
+
+
 def get_columns_ML_prediction(csv_path, pipeline, num_rows=500):
-    ext = PredictColumnInfoExtractor(n_rows=num_rows)
+    ext = PredictCSVColumnInfoExtractor(n_rows=num_rows)
     csv_info = ext.transform(csv_path)
     if not csv_info:
         # logger.error("Could not read {}".format(csv_path))
@@ -125,9 +126,8 @@ def get_columns_types(y_pred, csv_info):
 # dict_columns = get_columns_types(y_pred, csv_info)
 # print(dict_columns)
 if __name__ == '__main__':
-
     import joblib
-    
+
     pp = joblib.load("models/model.joblib")
     y_pred, csv_info = get_columns_ML_prediction("/home/pavel/7c952230-af2f-4e42-8490-285f2abe3875.csv", pipeline=pp)
     dict_columns = get_columns_types(y_pred, csv_info)
