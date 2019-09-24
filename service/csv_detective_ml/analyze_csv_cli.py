@@ -23,8 +23,8 @@ import os, sys
 import logging
 
 
-from csv_detective_ml.prediction import get_columns_ML_prediction, get_columns_types
-from csv_detective_ml.utils.files_io import extract_id, get_files
+from prediction import get_columns_ML_prediction, get_columns_types
+from utils.files_io import extract_id, get_files
 ML_PIPELINE = None
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
