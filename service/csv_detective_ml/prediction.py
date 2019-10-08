@@ -120,11 +120,6 @@ def get_columns_types(y_pred, csv_info):
             dict_columns[header].append(most_freq_label)
     return dict_columns
 
-
-# pp = joblib.load("models/model.joblib")
-# y_pred, csv_info = get_columns_ML_prediction("/home/pavel/temp/1614614e-44f8-4ee6-8e1a-24c172c596e2.csv", pipeline=pp)
-# dict_columns = get_columns_types(y_pred, csv_info)
-# print(dict_columns)
 if __name__ == '__main__':
     import joblib
 
