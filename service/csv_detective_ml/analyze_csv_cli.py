@@ -12,7 +12,9 @@ Arguments:
     --num_rows NROWS                   Number of rows per file to use [default: 500:int]
     --num_cores=<n> CORES                  Number of cores to use [default: 1:int]
 '''
+import datetime
 import json
+from pprint import pprint
 
 import joblib
 from argopt import argopt
@@ -87,7 +89,9 @@ if __name__ == '__main__':
 
     logger.info("Saving info to JSON")
     logger.debug(dict(csv_info))
-    json.dump(dict(csv_info), open("./csv_data_test.json", "w"))
+    today = datetime.datetime.today().strftime('%Y-%m-%d')
+    pprint(csv_info)
+    json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{today}_csv_data_test.json", "w"))
 
 
 
