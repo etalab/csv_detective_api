@@ -124,6 +124,7 @@ if __name__ == '__main__':
     import joblib
 
     pp = joblib.load("models/model.joblib")
-    y_pred, csv_info = get_columns_ML_prediction("/home/pavel/7c952230-af2f-4e42-8490-285f2abe3875.csv", pipeline=pp)
+    # y_pred, csv_info = get_columns_ML_prediction("/home/pavel/7c952230-af2f-4e42-8490-285f2abe3875.csv", pipeline=pp)
+    y_pred, csv_info = get_columns_ML_prediction("/data/datagouv/csv_top/af637e2e-64cc-447f-afc4-7376be8d5eb0.csv", pipeline=pp)
     dict_columns = get_columns_types(y_pred, csv_info)
     print(dict_columns)
