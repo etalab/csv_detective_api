@@ -14,7 +14,6 @@ Arguments:
 '''
 import datetime
 import json
-from pprint import pprint
 
 import joblib
 from argopt import argopt
@@ -31,9 +30,12 @@ ML_PIPELINE = None
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
+try:
+    RESOURCEID2DATASETID = json.load(open("./data/2019-10-23_resourceID2datasetID.json"))
+except:
+    RESOURCEID2DATASETID = {}
 
-
-def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500):
+def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, include_datasetID=True):
     logger.info(" csv_detective on {}".format(file_path))
 
     try:
@@ -59,7 +61,14 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500):
             logger.info("Analyzing file {0} failed with {1}".format(file_path, e))
             return extract_id(file_path), {"error": "{}".format(e)}
 
-    return extract_id(file_path), dict_result
+    if include_datasetID:
+        final_id = extract_id(file_path)
+        if final_id in RESOURCEID2DATASETID:
+            final_id = f"{RESOURCEID2DATASETID[final_id]}/{final_id}"
+        else:
+            final_id = f"NODATASETID/{final_id}"
+            logger.info(f"Resource ID {final_id} not found in RESOURCEID2DATASETID dict")
+    return final_id, dict_result
 
 
 if __name__ == '__main__':
@@ -89,8 +98,7 @@ if __name__ == '__main__':
 
     logger.info("Saving info to JSON")
     logger.debug(dict(csv_info))
-    today = datetime.datetime.today().strftime('%Y-%m-%d')
-    pprint(csv_info)
+    today = datetime.datetime.today().strftime('%Y-%m-%d-%H_%M')
     json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{today}_csv_data_test.json", "w"))
 
 
