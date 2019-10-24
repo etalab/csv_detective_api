@@ -35,7 +35,7 @@ try:
 except:
     RESOURCEID2DATASETID = {}
 
-def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, include_datasetID=True):
+def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, include_datasetID=None):
     logger.info(" csv_detective on {}".format(file_path))
 
     try:
@@ -63,8 +63,8 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, in
 
     if include_datasetID:
         final_id = extract_id(file_path)
-        if final_id in RESOURCEID2DATASETID:
-            final_id = f"{RESOURCEID2DATASETID[final_id]}/{final_id}"
+        if final_id in include_datasetID:
+            final_id = f"{include_datasetID[final_id]}/{final_id}"
         else:
             final_id = f"NODATASETID/{final_id}"
             logger.info(f"Resource ID {final_id} not found in RESOURCEID2DATASETID dict")
@@ -90,10 +90,12 @@ if __name__ == '__main__':
 
     if n_jobs and n_jobs > 1:
         csv_info = Parallel(n_jobs=n_jobs)(
-            delayed(analyze_csv)(file_path, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=num_rows)
+            delayed(analyze_csv)(file_path, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=num_rows,
+                                 include_datasetID=dict(RESOURCEID2DATASETID))
             for file_path in tqdm(list_files))
     else:
-        csv_info = [analyze_csv(f, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=num_rows)
+        csv_info = [analyze_csv(f, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=num_rows,
+                                include_datasetID=dict(RESOURCEID2DATASETID))
                     for f in tqdm(list_files)]
 
     logger.info("Saving info to JSON")
