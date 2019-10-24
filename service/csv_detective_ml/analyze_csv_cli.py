@@ -23,9 +23,9 @@ from tqdm import tqdm
 import os, sys
 import logging
 
-
 from prediction import get_columns_ML_prediction, get_columns_types
 from utils.files_io import extract_id, get_files
+
 ML_PIPELINE = None
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -35,9 +35,16 @@ try:
 except:
     RESOURCEID2DATASETID = {}
 
+
 def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, include_datasetID=None):
     logger.info(" csv_detective on {}".format(file_path))
-
+    if include_datasetID:
+        final_id = extract_id(file_path)
+        if final_id in include_datasetID:
+            final_id = f"{include_datasetID[final_id]}/{final_id}"
+        else:
+            final_id = f"NODATASETID/{final_id}"
+            logger.info(f"Resource ID {final_id} not found in RESOURCEID2DATASETID dict")
     try:
         if analysis_type == "both" or analysis_type == "rule":
             logger.info(f"Starting vanilla CSV Detective on file {file_path}")
@@ -58,16 +65,9 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, in
             dict_result["columns_ml"] = get_columns_types(y_pred, csv_info)
 
     except Exception as e:
-            logger.info("Analyzing file {0} failed with {1}".format(file_path, e))
-            return extract_id(file_path), {"error": "{}".format(e)}
+        logger.info("Analyzing file {0} failed with {1}".format(file_path, e))
+        return final_id, {"error": "{}".format(e)}
 
-    if include_datasetID:
-        final_id = extract_id(file_path)
-        if final_id in include_datasetID:
-            final_id = f"{include_datasetID[final_id]}/{final_id}"
-        else:
-            final_id = f"NODATASETID/{final_id}"
-            logger.info(f"Resource ID {final_id} not found in RESOURCEID2DATASETID dict")
     return final_id, dict_result
 
 
@@ -102,7 +102,3 @@ if __name__ == '__main__':
     logger.debug(dict(csv_info))
     today = datetime.datetime.today().strftime('%Y-%m-%d-%H_%M')
     json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{today}_csv_data_test.json", "w"))
-
-
-
-
