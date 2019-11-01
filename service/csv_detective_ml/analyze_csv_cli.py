@@ -98,7 +98,10 @@ if __name__ == '__main__':
                                 include_datasetID=dict(RESOURCEID2DATASETID))
                     for f in tqdm(list_files)]
 
+
+
+
     logger.info("Saving info to JSON")
     logger.debug(dict(csv_info))
     today = datetime.datetime.today().strftime('%Y-%m-%d-%H_%M')
-    json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{today}_csv_data_test.json", "w"))
+    json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{today}_csv_analysis_{analysis_type}.json", "w"))
