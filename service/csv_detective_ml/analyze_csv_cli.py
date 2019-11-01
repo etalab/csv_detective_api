@@ -35,7 +35,7 @@ try:
 except:
     RESOURCEID2DATASETID = {}
 
-
+TODAY = datetime.datetime.today().strftime('%Y-%m-%d-%H_%M')
 def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, include_datasetID=None):
     logger.info(" csv_detective on {}".format(file_path))
     if include_datasetID:
@@ -64,9 +64,12 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, in
             y_pred, csv_info = get_columns_ML_prediction(file_path, pipeline, num_rows=num_rows)
             dict_result["columns_ml"] = get_columns_types(y_pred, csv_info)
 
+
     except Exception as e:
         logger.info("Analyzing file {0} failed with {1}".format(file_path, e))
         return final_id, {"error": "{}".format(e)}
+
+    dict_result['analysis_date'] = TODAY
 
     return final_id, dict_result
 
@@ -103,5 +106,5 @@ if __name__ == '__main__':
 
     logger.info("Saving info to JSON")
     logger.debug(dict(csv_info))
-    today = datetime.datetime.today().strftime('%Y-%m-%d-%H_%M')
-    json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{today}_csv_analysis_{analysis_type}.json", "w"))
+
+    json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{TODAY}_csv_analysis_{analysis_type}.json", "w"))
