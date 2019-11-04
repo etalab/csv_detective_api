@@ -28,7 +28,7 @@ from xgboost import XGBClassifier
 # logger.addHandler(logging.StreamHandler())
 from features import ItemSelector, CustomFeatures, ColumnInfoExtractor
 # from prediction import PredictCSVColumnInfoExtractor
-# from service.csv_detective_ml.utils import header_tokenizer
+# from service.csv_detective_ml.utils_ml import header_tokenizer
 
 if __name__ == '__main__':
     parser = argopt(__doc__).parse_args()
