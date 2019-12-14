@@ -82,6 +82,7 @@ if __name__ == '__main__':
     num_rows = parser.num_rows
     n_jobs = int(parser.num_cores)
 
+    analysis_name = os.path.basename(os.path.dirname(csv_folder_path))
     if analysis_type != "rule":
         logger.info("Loading ML model...")
         ML_PIPELINE = joblib.load('csv_detective_ml/models/model.joblib')
@@ -101,10 +102,7 @@ if __name__ == '__main__':
                                 include_datasetID=dict(RESOURCEID2DATASETID))
                     for f in tqdm(list_files)]
 
-
-
-
     logger.info("Saving info to JSON")
     logger.info(dict(csv_info))
 
-    json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{TODAY}_csv_analysis_{analysis_type}.json", "w"))
+    json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{TODAY}_{analysis_name}_{analysis_type}.json", "w"))
