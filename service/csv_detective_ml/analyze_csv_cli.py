@@ -105,6 +105,6 @@ if __name__ == '__main__':
 
 
     logger.info("Saving info to JSON")
-    logger.debug(dict(csv_info))
+    logger.info(dict(csv_info))
 
     json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{TODAY}_csv_analysis_{analysis_type}.json", "w"))

@@ -75,11 +75,11 @@ if __name__ == '__main__':
             ],
 
             # weight components in FeatureUnion
-              transformer_weights={
-                  'custom_features': 1.6,
-                  'cell_features': 1,
-                  'header_features': .3,
-              },
+            #   transformer_weights={
+            #       'custom_features': 1.6,
+            #       'cell_features': 1,
+            #       'header_features': .3,
+            #   },
 
         )),
 

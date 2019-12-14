@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 import numpy as np
 from csv_detective.detection import detect_encoding, detect_separator, detect_headers, parse_table
@@ -99,10 +99,11 @@ def get_columns_ML_prediction(csv_path, pipeline, num_rows=500):
 
 
 def get_columns_types(y_pred, csv_info):
-    def get_most_frequent(list_predictions):
-        u, counts = np.unique(list_predictions, return_counts=True)
+    def get_most_frequent(header, list_predictions):
+        type_, counts = Counter(list_predictions).most_common(1)[0]
+        # u, counts = np.unique(list_predictions, return_counts=True)
         # print(u, counts)
-        return u[0]
+        return type_
 
     assert (len(y_pred) == len(csv_info["all_headers"]))
     dict_columns = defaultdict(list)
@@ -114,7 +115,7 @@ def get_columns_types(y_pred, csv_info):
         if not per_header_predictions[header.lower()]:
             continue
         else:
-            most_freq_label = get_most_frequent(per_header_predictions[header.lower()])
+            most_freq_label = get_most_frequent(header, per_header_predictions[header.lower()])
             if most_freq_label == "O":
                 continue
             dict_columns[header].append(most_freq_label)
