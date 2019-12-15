@@ -20,11 +20,11 @@ from argopt import argopt
 from csv_detective.explore_csv import routine
 from joblib import Parallel, delayed
 from tqdm import tqdm
-import os, sys
+import os
 import logging
 
 from prediction import get_columns_ML_prediction, get_columns_types
-from utils.files_io import extract_id, get_files
+from utils_ml.files_io import extract_id, get_files
 
 ML_PIPELINE = None
 logger = logging.getLogger()
@@ -74,6 +74,38 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, in
     return final_id, dict_result
 
 
+# def resource2dataset(csv_dective_datasets):
+#     """
+#     Converts a csv detective result indexed by resources to a dataset indexed result
+#     I.e.: From this:
+#     {
+#         resource1: { "encoding": "...",
+#                      "columns_rb": {}
+#                      ...
+#                     }
+#         resource2: {...}
+#     }
+#     to this:
+#     {
+#         dataset1:  {
+#                      resource1:   { "encoding": "...",
+#                                     "columns_rb": {}
+#                                     ...
+#                      resource2:   {...}
+#                     }
+#         dataset2: {...}
+#     }
+#
+#
+#     :param csv_dective_datasets: The output of a analyze_csv_cli (dict)
+#     :return: A dataset indexed dict
+#     """
+#     csv_detective_datasets = defaultdict(dict)
+#     for resource_id, csv_detective_result in csv_dective_resources.items():
+#
+#     pass
+
+
 if __name__ == '__main__':
     parser = argopt(__doc__).parse_args()
     csv_folder_path = parser.i
@@ -101,6 +133,9 @@ if __name__ == '__main__':
         csv_info = [analyze_csv(f, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=num_rows,
                                 include_datasetID=dict(RESOURCEID2DATASETID))
                     for f in tqdm(list_files)]
+
+
+
 
     logger.info("Saving info to JSON")
     logger.debug(dict(csv_info))
