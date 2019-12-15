@@ -14,18 +14,17 @@ Arguments:
 '''
 import datetime
 import json
-from collections import defaultdict
 
 import joblib
 from argopt import argopt
 from csv_detective.explore_csv import routine
 from joblib import Parallel, delayed
 from tqdm import tqdm
-import os, sys
+import os
 import logging
 
 from prediction import get_columns_ML_prediction, get_columns_types
-from utils.files_io import extract_id, get_files
+from utils_ml.files_io import extract_id, get_files
 
 ML_PIPELINE = None
 logger = logging.getLogger()
