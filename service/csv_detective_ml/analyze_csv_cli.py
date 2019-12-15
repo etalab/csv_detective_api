@@ -103,6 +103,7 @@ if __name__ == '__main__':
                     for f in tqdm(list_files)]
 
     logger.info("Saving info to JSON")
-    logger.info(dict(csv_info))
+    logger.debug(dict(csv_info))
 
-    json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{TODAY}_{analysis_name}_{analysis_type}.json", "w"))
+    json.dump(dict(csv_info), open(f"./csv_detective_ml/results/{TODAY}_{analysis_name}_{analysis_type}.json", "w"),
+              indent=4)
