@@ -36,6 +36,8 @@ except:
     RESOURCEID2DATASETID = {}
 
 TODAY = datetime.datetime.today().strftime('%Y-%m-%d-%H_%M')
+
+
 def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, include_datasetID=None):
     logger.info(" csv_detective on {}".format(file_path))
     if include_datasetID:
@@ -61,7 +63,8 @@ def analyze_csv(file_path, analysis_type="both", pipeline=None, num_rows=500, in
 
         if analysis_type != "rule":
             assert pipeline is not None
-            y_pred, csv_info = get_columns_ML_prediction(file_path, pipeline, num_rows=num_rows)
+            y_pred, csv_info = get_columns_ML_prediction(file_path, pipeline,
+                                                         dict_result, num_rows=num_rows)
             dict_result["columns_ml"] = get_columns_types(y_pred, csv_info)
 
 
@@ -119,10 +122,14 @@ if __name__ == '__main__':
         logger.info("Loading ML model...")
         ML_PIPELINE = joblib.load('csv_detective_ml/models/model.joblib')
 
-    if os.path.isfile(csv_folder_path):
-        list_files = [csv_folder_path]
+    if os.path.exists(csv_folder_path):
+        if os.path.isfile(csv_folder_path):
+            list_files = [csv_folder_path]
+        else:
+            list_files = get_files(csv_folder_path, sample=None)
     else:
-        list_files = get_files(csv_folder_path, sample=None)
+        logger.info("No file/folder found to analyze. Exiting...")
+        exit(1)
 
     if n_jobs and n_jobs > 1:
         csv_info = Parallel(n_jobs=n_jobs)(
@@ -133,9 +140,6 @@ if __name__ == '__main__':
         csv_info = [analyze_csv(f, analysis_type=analysis_type, pipeline=ML_PIPELINE, num_rows=num_rows,
                                 include_datasetID=dict(RESOURCEID2DATASETID))
                     for f in tqdm(list_files)]
-
-
-
 
     logger.info("Saving info to JSON")
     logger.debug(dict(csv_info))

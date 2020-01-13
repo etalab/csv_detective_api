@@ -10,41 +10,43 @@ class PredictCSVColumnInfoExtractor(BaseEstimator, TransformerMixin):
     the trained csv_detective ML pipeline
     """
 
-    def __init__(self, n_rows=200, n_jobs=1, save_dataset=False):
+    def __init__(self, n_rows=200, n_jobs=1, csv_metadata=None, save_dataset=False):
 
         self.n_rows = n_rows
         self.n_jobs = n_jobs
         self.save_dataset = save_dataset
         self._file_idx = {}
+        self.csv_metadata = csv_metadata
 
     def fit(self, X, y=None):
         return self
 
     def _load_file(self, file_path, n_rows):
-        with open(file_path, mode='rb') as binary_file:
-            encoding = detect_encoding(binary_file)['encoding']
+
+        if self.csv_metadata is None:
+
+            with open(file_path, mode='rb') as binary_file:
+                encoding = detect_encoding(binary_file)['encoding']
+
+            with open(file_path, 'r', encoding=encoding) as str_file:
+                sep = detect_separator(str_file)
+
+        else:
+            encoding = self.csv_metadata['encoding']
+            sep = self.csv_metadata['separator']
 
         with open(file_path, 'r', encoding=encoding) as str_file:
-            sep = detect_separator(str_file)
-            header_row_idx, header = detect_headers(str_file, sep)
-            if header is None:
-                return_dict = {'error': True}
-                return return_dict
-            elif isinstance(header, list):
-                if any([x is None for x in header]):
-                    return_dict = {'error': True}
-                    return return_dict
-        try:
-            table, total_lines = parse_table(
-                file_path,
-                encoding,
-                sep,
-                header_row_idx,
-                n_rows,
-                random_state=42
-            )
-        except Exception as e:
-            return
+
+            try:
+                table, total_lines = parse_table(
+                    str_file,
+                    encoding,
+                    sep,
+                    n_rows,
+                    random_state=42
+                )
+            except Exception as e:
+                return
         if table.empty:
             print("Could not read {}".format(file_path))
             return
@@ -87,8 +89,8 @@ def get_column_prediction(column_series, pipeline):
     pass
 
 
-def get_columns_ML_prediction(csv_path, pipeline, num_rows=500):
-    ext = PredictCSVColumnInfoExtractor(n_rows=num_rows)
+def get_columns_ML_prediction(csv_path, pipeline, csv_metadata=None, num_rows=500):
+    ext = PredictCSVColumnInfoExtractor(n_rows=num_rows, csv_metadata=csv_metadata)
     csv_info = ext.transform(csv_path)
     if not csv_info:
         # logger.error("Could not read {}".format(csv_path))
