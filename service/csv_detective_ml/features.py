@@ -14,6 +14,7 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.svm import SVC
+from tqdm import tqdm
 from xgboost import XGBClassifier
 import re
 
@@ -103,7 +104,6 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
             file_path,
             encoding,
             sep,
-            header_row_idx,
             n_rows,
             random_state=42
         )
@@ -205,10 +205,10 @@ class ColumnInfoExtractor(BaseEstimator, TransformerMixin):
         if self.n_jobs and self.n_jobs > 1:
             csv_info = Parallel(n_jobs=self.n_jobs)(
                 delayed(self._extract_columns)(file_path)
-                for file_path in list_files)
+                for file_path in tqdm(list_files))
         else:
             csv_info = [self._extract_columns(f)
-                        for f in list_files]
+                        for f in tqdm(list_files)]
 
         dataset_items = defaultdict(lambda: defaultdict(list)) # dict of dict of lists
 
